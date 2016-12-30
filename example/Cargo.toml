@@ -1,0 +1,9 @@
+[package]
+name = "example"
+version = "0.1.0"
+authors = ["David Tolnay <dtolnay@gmail.com>"]
+
+[dependencies]
+demo-hack = { path = "../demo-hack" }
+demo-hack-impl = { path = "../demo-hack-impl" }
+proc-macro-hack = { path = ".." }

@@ -1,0 +1,11 @@
+[package]
+name = "demo-hack-impl"
+version = "0.1.0"
+authors = ["David Tolnay <dtolnay@gmail.com>"]
+
+[lib]
+proc-macro = true
+
+[dependencies]
+proc-macro-hack = { path = ".." }
+proc-macro-hack-impl = { path = "../impl" }
