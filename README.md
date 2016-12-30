@@ -6,6 +6,9 @@ Procedural functionlike!() macros using only Macros 1.1
 
 Did you think Macros 1.1 was only for custom derives? Think again.
 
+*Note:* Currently only works with nightly-2016-11-06 because of
+[rust-lang/rust#38706](https://github.com/rust-lang/rust/issues/38706).
+
 ## Defining procedural macros
 
 Two crates are required to define a macro.
