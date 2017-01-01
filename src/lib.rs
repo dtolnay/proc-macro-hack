@@ -53,7 +53,7 @@ macro_rules! proc_macro_expr_impl {
                     Ok(expr) => {
                         format!("
                             macro_rules! proc_macro_call {{
-                                ($($tt:tt)*) => {{
+                                () => {{
                                     {}
                                 }}
                             }}
