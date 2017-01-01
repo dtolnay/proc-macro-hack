@@ -1,0 +1,8 @@
+sudo: false
+
+language: rust
+
+rust: nightly-2016-11-06
+
+script:
+  - cd example && cargo run
