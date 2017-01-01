@@ -9,7 +9,7 @@ pub use proc_macro::TokenStream;
 macro_rules! proc_macro_expr_decl {
     ($name:ident ! => $name_impl:ident) => {
         #[derive(ProcMacroHackExpr)]
-        #[allow(unused)]
+        #[allow(unused, non_camel_case_types)]
         enum $name {
             $name_impl
         }
@@ -20,7 +20,7 @@ macro_rules! proc_macro_expr_decl {
 macro_rules! proc_macro_item_decl {
     ($name:ident ! => $name_impl:ident) => {
         #[derive(ProcMacroHackItem)]
-        #[allow(unused)]
+        #[allow(unused, non_camel_case_types)]
         enum $name {
             $name_impl
         }

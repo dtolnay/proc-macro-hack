@@ -49,7 +49,8 @@ fn names(input: TokenStream) -> (String, String) {
     let source = input.to_string();
 
     let mut words = source.split_whitespace();
-    assert_eq!(Some("#[allow(unused)]"), words.next());
+    assert_eq!(Some("#[allow(unused,"), words.next());
+    assert_eq!(Some("non_camel_case_types)]"), words.next());
     assert_eq!(Some("enum"), words.next());
     let name = words.next().unwrap();
     assert_eq!(Some("{"), words.next());
