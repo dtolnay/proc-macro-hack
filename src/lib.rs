@@ -31,7 +31,7 @@ macro_rules! proc_macro_item_decl {
 macro_rules! proc_macro_expr_impl {
     ($(
         $( #[$attr:meta] )*
-        pub fn $func:ident($input:ident: &str ) -> Result<String, String> $body:block
+        pub fn $func:ident($input:ident: &str) -> String $body:block
     )+) => {
         $(
             $( #[$attr] )*
@@ -47,22 +47,15 @@ macro_rules! proc_macro_expr_impl {
 
                 let tokens = &source[prefix.len() .. source.len() - suffix.len()];
 
-                fn func($input: &str) -> Result<String, String> $body
+                fn func($input: &str) -> String $body
 
-                let wrap = match func(tokens) {
-                    Ok(expr) => {
-                        format!("
-                            macro_rules! proc_macro_call {{
-                                () => {{
-                                    {}
-                                }}
-                            }}
-                        ", expr)
-                    }
-                    Err(msg) => panic!(msg)
-                };
-
-                wrap.parse().unwrap()
+                format!("
+                    macro_rules! proc_macro_call {{
+                        () => {{
+                            {}
+                        }}
+                    }}
+                ", func(tokens)).parse().unwrap()
             }
         )+
     }
@@ -72,7 +65,7 @@ macro_rules! proc_macro_expr_impl {
 macro_rules! proc_macro_item_impl {
     ($(
         $( #[$attr:meta] )*
-        pub fn $func:ident($input:ident: &str ) -> Result<String, String> $body:block
+        pub fn $func:ident($input:ident: &str) -> String $body:block
     )+) => {
         $(
             $( #[$attr] )*
@@ -88,9 +81,9 @@ macro_rules! proc_macro_item_impl {
 
                 let tokens = &source[prefix.len() .. source.len() - suffix.len()];
 
-                fn func($input: &str) -> Result<String, String> $body
+                fn func($input: &str) -> String $body
 
-                func(tokens).unwrap_or_else(|msg| panic!(msg)).parse().unwrap()
+                func(tokens).parse().unwrap()
             }
         )+
     }

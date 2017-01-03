@@ -50,15 +50,15 @@ https://github.com/dtolnay/proc-macro-hack/tree/master/demo-hack-impl
 
 proc_macro_expr_impl! {
     /// Add one to an expression.
-    pub fn add_one_impl(input: &str) -> Result<String, String> {
-        Ok(format!("1 + {}", input))
+    pub fn add_one_impl(input: &str) -> String {
+        format!("1 + {}", input)
     }
 }
 
 proc_macro_item_impl! {
     /// A function that always returns 2.
-    pub fn two_fn_impl(input: &str) -> Result<String, String> {
-        Ok(format!("fn {}() -> u8 {{ 2 }}", input))
+    pub fn two_fn_impl(input: &str) -> String {
+        format!("fn {}() -> u8 {{ 2 }}", input)
     }
 }
 ```
@@ -84,7 +84,7 @@ proc-macro = true
 
 Users of your crate depend on your declaration crate and implementation crate,
 then use your procedural macros as though it were magic. They even get
-reasonable error messages if your procedural macro returns an error.
+reasonable error messages if your procedural macro panics.
 
 https://github.com/dtolnay/proc-macro-hack/tree/master/example
 
