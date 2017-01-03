@@ -68,8 +68,8 @@ implementation crate:
 
 ```toml
 [dependencies]
-proc-macro-hack = "0.1"
-proc-macro-hack-impl = "0.1"
+proc-macro-hack = "0.2"
+proc-macro-hack-impl = "0.2"
 ```
 
 Additionally, your implementation crate (but not your declaration crate) is a
