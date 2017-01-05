@@ -2,7 +2,7 @@ sudo: false
 
 language: rust
 
-rust: nightly-2016-11-06
+rust: nightly
 
 script:
   - cd example && cargo run
