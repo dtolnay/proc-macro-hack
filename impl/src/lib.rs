@@ -14,7 +14,7 @@ pub fn hack_expr(input: TokenStream) -> TokenStream {
                 #[derive({})]
                 #[allow(unused)]
                 enum ProcMacroHack {{
-                    Input = {{ stringify!($($tt)*); 0 }}
+                    Input = (stringify!($($tt)*), 0).1
                 }}
 
                 proc_macro_call!()
@@ -36,7 +36,7 @@ pub fn hack_item(input: TokenStream) -> TokenStream {
                 #[derive({})]
                 #[allow(unused)]
                 enum ProcMacroHack {{
-                    Input = {{ stringify!($($tt)*); 0 }}
+                    Input = (stringify!($($tt)*), 0).1
                 }}
             }}
         }}

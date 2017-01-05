@@ -39,8 +39,8 @@ macro_rules! proc_macro_expr_impl {
             pub fn $func(input: $crate::TokenStream) -> $crate::TokenStream {
                 let source = input.to_string();
 
-                let prefix = "#[allow(unused)]\nenum ProcMacroHack { Input = { stringify!(";
-                let suffix = "); 0 }, }\n";
+                let prefix = "#[allow(unused)]\nenum ProcMacroHack { Input = (stringify!(";
+                let suffix = "), 0).1, }\n";
                 if !(source.starts_with(prefix) && source.ends_with(suffix)) {
                     panic!("`{}` procedural macro failed", stringify!($func));
                 }
@@ -73,8 +73,8 @@ macro_rules! proc_macro_item_impl {
             pub fn $func(input: $crate::TokenStream) -> $crate::TokenStream {
                 let source = input.to_string();
 
-                let prefix = "#[allow(unused)]\nenum ProcMacroHack { Input = { stringify!(";
-                let suffix = "); 0 }, }\n";
+                let prefix = "#[allow(unused)]\nenum ProcMacroHack { Input = (stringify!(";
+                let suffix = "), 0).1, }\n";
                 if !(source.starts_with(prefix) && source.ends_with(suffix)) {
                     panic!("`{}` procedural macro failed", stringify!($func));
                 }
