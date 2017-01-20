@@ -20,8 +20,6 @@ traits or functions or ordinary macros.
 https://github.com/dtolnay/proc-macro-hack/tree/master/demo-hack
 
 ```rust
-#![feature(proc_macro)]
-
 #[macro_use] extern crate proc_macro_hack;
 #[macro_use] extern crate proc_macro_hack_impl;
 
@@ -40,8 +38,6 @@ and private modules are fine but nothing can be public.
 https://github.com/dtolnay/proc-macro-hack/tree/master/demo-hack-impl
 
 ```rust
-#![feature(proc_macro, proc_macro_lib)]
-
 #[macro_use] extern crate proc_macro_hack;
 #[macro_use] extern crate proc_macro_hack_impl;
 
@@ -86,8 +82,6 @@ reasonable error messages if your procedural macro panics.
 https://github.com/dtolnay/proc-macro-hack/tree/master/example
 
 ```rust
-#![feature(proc_macro)]
-
 #[macro_use] extern crate demo_hack;
 #[macro_use] extern crate demo_hack_impl;
 
