@@ -6,7 +6,7 @@ Procedural functionlike!() macros using only Macros 1.1
 
 Did you think Macros 1.1 was only for custom derives? Think again.
 
-*Note:* Requires nightly-2017-01-04 or later.
+*Note:* Requires stable Rust 1.15.0 or nightly-2017-01-04 or later.
 
 ## Defining procedural macros
 
