@@ -1,5 +1,3 @@
-#![feature(proc_macro)]
-
 #[macro_use] extern crate proc_macro_hack;
 #[macro_use] extern crate proc_macro_hack_impl;
 
