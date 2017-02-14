@@ -3,6 +3,10 @@ use proc_macro::TokenStream;
 
 #[proc_macro_derive(ProcMacroHackExpr)]
 pub fn hack_expr(input: TokenStream) -> TokenStream {
+    if input.to_string().trim() == "struct Ignored;" {
+        return "".parse().unwrap();
+    }
+
     let (name, name_impl) = names(input);
 
     let rules = format!("
@@ -25,6 +29,10 @@ pub fn hack_expr(input: TokenStream) -> TokenStream {
 
 #[proc_macro_derive(ProcMacroHackItem)]
 pub fn hack_item(input: TokenStream) -> TokenStream {
+    if input.to_string().trim() == "struct Ignored;" {
+        return "".parse().unwrap();
+    }
+
     let (name, name_impl) = names(input);
 
     let rules = format!("

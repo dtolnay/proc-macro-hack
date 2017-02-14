@@ -35,6 +35,10 @@ macro_rules! proc_macro_expr_impl {
             $( #[$attr] )*
             #[proc_macro_derive($func)]
             pub fn $func(input: $crate::TokenStream) -> $crate::TokenStream {
+                #[derive(ProcMacroHackExpr)]
+                struct Ignored;
+                let _ = Ignored;
+
                 let source = input.to_string();
                 let source = source.trim();
 
@@ -70,6 +74,10 @@ macro_rules! proc_macro_item_impl {
             $( #[$attr] )*
             #[proc_macro_derive($func)]
             pub fn $func(input: $crate::TokenStream) -> $crate::TokenStream {
+                #[derive(ProcMacroHackItem)]
+                struct Ignored;
+                let _ = Ignored;
+
                 let source = input.to_string();
                 let source = source.trim();
 
