@@ -1,9 +1,11 @@
 [package]
 name = "demo-hack"
-version = "0.0.0"
+version = "0.0.1"
 authors = ["David Tolnay <dtolnay@gmail.com>"]
-publish = false
+license = "MIT/Apache-2.0"
+description = "Demo of proc-macro-hack"
+repository = "https://github.com/dtolnay/proc-macro-hack"
 
 [dependencies]
-proc-macro-hack = { path = ".." }
-proc-macro-hack-impl = { path = "../impl" }
+proc-macro-hack = { version = "0.2", path = ".." }
+proc-macro-hack-impl = { version = "0.2", path = "../impl" }
