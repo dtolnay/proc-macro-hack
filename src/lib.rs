@@ -1,5 +1,10 @@
 extern crate proc_macro;
 
+// Allow the "unused" #[macro_use] because there is a different un-ignorable
+// warning otherwise:
+//
+//    proc macro crates and `#[no_link]` crates have no effect without `#[macro_use]`
+#[allow(unused_imports)]
 #[macro_use]
 extern crate proc_macro_hack_impl;
 pub use proc_macro_hack_impl::*;
