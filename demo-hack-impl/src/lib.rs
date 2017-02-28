@@ -1,5 +1,5 @@
-#[macro_use] extern crate proc_macro_hack;
-#[macro_use] extern crate proc_macro_hack_impl;
+#[macro_use]
+extern crate proc_macro_hack;
 
 proc_macro_expr_impl! {
     /// Add one to an expression.

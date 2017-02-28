@@ -25,8 +25,12 @@ traits or functions or ordinary macros.
 https://github.com/dtolnay/proc-macro-hack/tree/master/demo-hack
 
 ```rust
-#[macro_use] extern crate proc_macro_hack;
-#[macro_use] extern crate proc_macro_hack_impl;
+#[macro_use]
+extern crate proc_macro_hack;
+
+#[macro_use]
+extern crate demo_hack_impl;
+pub use demo_hack_impl::*;
 
 /// Add one to an expression.
 proc_macro_expr_decl!(add_one! => add_one_impl);
@@ -43,8 +47,8 @@ and private modules are fine but nothing can be public.
 https://github.com/dtolnay/proc-macro-hack/tree/master/demo-hack-impl
 
 ```rust
-#[macro_use] extern crate proc_macro_hack;
-#[macro_use] extern crate proc_macro_hack_impl;
+#[macro_use]
+extern crate proc_macro_hack;
 
 proc_macro_expr_impl! {
     /// Add one to an expression.
@@ -61,13 +65,11 @@ proc_macro_item_impl! {
 }
 ```
 
-Both crates depend on `proc-macro-hack` which itself has a declaration crate and
-implementation crate:
+Both crates depend on `proc-macro-hack`:
 
 ```toml
 [dependencies]
-proc-macro-hack = "0.2"
-proc-macro-hack-impl = "0.2"
+proc-macro-hack = "0.3"
 ```
 
 Additionally, your implementation crate (but not your declaration crate) is a
@@ -80,15 +82,15 @@ proc-macro = true
 
 ## Using procedural macros
 
-Users of your crate depend on your declaration crate and implementation crate,
-then use your procedural macros as though it were magic. They even get
+Users of your crate depend on your declaration crate (not your implementation
+crate), then use your procedural macros as though it were magic. They even get
 reasonable error messages if your procedural macro panics.
 
 https://github.com/dtolnay/proc-macro-hack/tree/master/example
 
 ```rust
-#[macro_use] extern crate demo_hack;
-#[macro_use] extern crate demo_hack_impl;
+#[macro_use]
+extern crate demo_hack;
 
 two_fn!(two);
 
@@ -102,8 +104,6 @@ fn main() {
 ## Limitations
 
 - The input to your macro cannot contain dollar signs.
-- Users of your macro need to `#[macro_use] extern crate` two different crates,
-  not just one.
 - Your macro must expand to either an expression or zero-or-more items, cannot
   sometimes be one or the other depending on input.
 

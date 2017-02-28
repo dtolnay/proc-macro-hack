@@ -6,5 +6,3 @@ publish = false
 
 [dependencies]
 demo-hack = { path = "../demo-hack" }
-demo-hack-impl = { path = "../demo-hack-impl" }
-proc-macro-hack = { path = ".." }
