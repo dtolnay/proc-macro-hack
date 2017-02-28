@@ -8,3 +8,4 @@ repository = "https://github.com/dtolnay/proc-macro-hack"
 
 [dependencies]
 proc-macro-hack-impl = { version = "0.3", path = "impl" }
+uuid = { version = "0.4", features = ["v4"] }

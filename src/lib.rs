@@ -1,4 +1,5 @@
 extern crate proc_macro;
+extern crate uuid;
 
 // Allow the "unused" #[macro_use] because there is a different un-ignorable
 // warning otherwise:
@@ -11,6 +12,9 @@ pub use proc_macro_hack_impl::*;
 
 #[doc(hidden)]
 pub use proc_macro::TokenStream;
+
+#[doc(hidden)]
+pub use uuid::Uuid;
 
 #[macro_export]
 macro_rules! proc_macro_expr_decl {
@@ -55,15 +59,28 @@ macro_rules! proc_macro_expr_impl {
 
                 let tokens = &source[prefix.len() .. source.len() - suffix.len()];
 
+                let uuid = $crate::Uuid::new_v4();
+
                 fn func($input: &str) -> String $body
 
-                format!("
-                    macro_rules! proc_macro_call {{
+                let items = format!("
+                    macro_rules! proc_macro_{uuid} {{
                         () => {{
-                            {}
+                            {result}
                         }}
                     }}
-                ", func(tokens)).parse().unwrap()
+
+                    #[macro_use]
+                    mod proc_macro_mod {{
+                        macro_rules! proc_macro_call {{
+                            () => {{
+                                proc_macro_{uuid}!()
+                            }}
+                        }}
+                    }}
+                ", result=func(tokens), uuid=uuid.simple());
+
+                items.parse().unwrap()
             }
         )+
     }
