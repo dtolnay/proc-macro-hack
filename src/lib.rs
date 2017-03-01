@@ -47,13 +47,23 @@ macro_rules! proc_macro_expr_impl {
                 let source = input.to_string();
                 let source = source.trim();
 
-                let prefix = "#[allow(unused)]\nenum ProcMacroHack { Input = (stringify!(";
-                let suffix = "), 0).1, }";
-                if !(source.starts_with(prefix) && source.ends_with(suffix)) {
-                    panic!("`{}` procedural macro failed", stringify!($func));
-                }
+                let prefix = "#[allow(unused)]\nenum ProcMacroHack {";
+                let suffix = "}";
+                assert!(source.starts_with(prefix));
+                assert!(source.ends_with(suffix));
+                let source = &source[prefix.len() .. source.len() - suffix.len()].trim();
 
-                let tokens = &source[prefix.len() .. source.len() - suffix.len()];
+                let prefix = "Input =";
+                let suffix = "0).1,";
+                assert!(source.starts_with(prefix));
+                assert!(source.ends_with(suffix));
+                let source = &source[prefix.len() .. source.len() - suffix.len()].trim();
+
+                let prefix = "(stringify!(";
+                let suffix = "),";
+                assert!(source.starts_with(prefix));
+                assert!(source.ends_with(suffix));
+                let tokens = &source[prefix.len() .. source.len() - suffix.len()].trim();
 
                 fn func($input: &str) -> String $body
 
@@ -82,13 +92,23 @@ macro_rules! proc_macro_item_impl {
                 let source = input.to_string();
                 let source = source.trim();
 
-                let prefix = "#[allow(unused)]\nenum ProcMacroHack { Input = (stringify!(";
-                let suffix = "), 0).1, }";
-                if !(source.starts_with(prefix) && source.ends_with(suffix)) {
-                    panic!("`{}` procedural macro failed", stringify!($func));
-                }
+                let prefix = "#[allow(unused)]\nenum ProcMacroHack {";
+                let suffix = "}";
+                assert!(source.starts_with(prefix));
+                assert!(source.ends_with(suffix));
+                let source = &source[prefix.len() .. source.len() - suffix.len()].trim();
 
-                let tokens = &source[prefix.len() .. source.len() - suffix.len()];
+                let prefix = "Input =";
+                let suffix = "0).1,";
+                assert!(source.starts_with(prefix));
+                assert!(source.ends_with(suffix));
+                let source = &source[prefix.len() .. source.len() - suffix.len()].trim();
+
+                let prefix = "(stringify!(";
+                let suffix = "),";
+                assert!(source.starts_with(prefix));
+                assert!(source.ends_with(suffix));
+                let tokens = &source[prefix.len() .. source.len() - suffix.len()].trim();
 
                 fn func($input: &str) -> String $body
 
