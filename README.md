@@ -108,6 +108,8 @@ fn main() {
 - The input to your macro cannot contain dollar signs.
 - Your macro must expand to either an expression or zero-or-more items, cannot
   sometimes be one or the other depending on input.
+- An item macro cannot be invoked multiple times within the same scope (#2).
+- An expression macro cannot expand into recursive calls to itself (#4).
 
 ## License
 
