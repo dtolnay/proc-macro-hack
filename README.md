@@ -110,11 +110,14 @@ fn main() {
 - The input to your macro cannot contain dollar signs ([#8][issue-8]).
 - Your macro must expand to either an expression or zero-or-more items, cannot
   sometimes be one or the other depending on input ([#9][issue-9]).
+- [Type macros] are not supported ([#10][issue-10]).
 
 [issue-2]: https://github.com/dtolnay/proc-macro-hack/issues/2
 [issue-4]: https://github.com/dtolnay/proc-macro-hack/issues/4
 [issue-8]: https://github.com/dtolnay/proc-macro-hack/issues/8
 [issue-9]: https://github.com/dtolnay/proc-macro-hack/issues/9
+[issue-10]: https://github.com/dtolnay/proc-macro-hack/issues/10
+[Type macros]: https://github.com/rust-lang/rfcs/blob/master/text/0873-type-macros.md
 
 ## License
 
