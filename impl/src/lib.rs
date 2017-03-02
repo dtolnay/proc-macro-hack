@@ -43,6 +43,14 @@ pub fn hack_item(input: TokenStream) -> TokenStream {
     rules.parse().unwrap()
 }
 
+/// Parses an input that looks like:
+///
+/// ```rust,ignore
+/// #[allow(unused, non_camel_case_types)]
+/// enum NAME {
+///     NAME_IMPL
+/// }
+/// ```
 fn names(input: TokenStream) -> (String, String) {
     let source = input.to_string();
 

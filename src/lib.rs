@@ -212,6 +212,14 @@ macro_rules! proc_macro_expr_impl {
         pub fn $func:ident($input:ident: &str) -> String $body:block
     )+) => {
         $(
+            // Parses an input that looks like:
+            //
+            // ```
+            // #[allow(unused)]
+            // enum ProcMacroHack {
+            //     Input = (stringify!(ARGS), 0).1,
+            // }
+            // ```
             $( #[$attr] )*
             #[proc_macro_derive($func)]
             pub fn $func(input: proc_macro_tokenstream!()) -> proc_macro_tokenstream!() {
@@ -257,6 +265,14 @@ macro_rules! proc_macro_item_impl {
         pub fn $func:ident($input:ident: &str) -> String $body:block
     )+) => {
         $(
+            // Parses an input that looks like:
+            //
+            // ```
+            // #[allow(unused)]
+            // enum ProcMacroHack {
+            //     Input = (stringify!(ARGS), 0).1,
+            // }
+            // ```
             $( #[$attr] )*
             #[proc_macro_derive($func)]
             pub fn $func(input: proc_macro_tokenstream!()) -> proc_macro_tokenstream!() {
