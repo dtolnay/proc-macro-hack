@@ -1,3 +1,4 @@
+#[cfg(feature = "proc_macro")]
 extern crate proc_macro;
 
 // Allow the "unused" #[macro_use] because there is a different un-ignorable
@@ -9,8 +10,27 @@ extern crate proc_macro;
 extern crate proc_macro_hack_impl;
 pub use proc_macro_hack_impl::*;
 
+#[cfg(feature = "proc_macro")]
 #[doc(hidden)]
 pub use proc_macro::TokenStream;
+
+#[cfg(feature = "proc_macro")]
+#[doc(hidden)]
+#[macro_export]
+macro_rules! proc_macro_tokenstream {
+    () => {
+        $crate::TokenStream
+    }
+}
+
+#[cfg(not(feature = "proc_macro"))]
+#[doc(hidden)]
+#[macro_export]
+macro_rules! proc_macro_tokenstream {
+    () => {
+        ::proc_macro::TokenStream
+    }
+}
 
 #[macro_export]
 macro_rules! proc_macro_expr_decl {
@@ -43,7 +63,7 @@ macro_rules! proc_macro_expr_impl {
         $(
             $( #[$attr] )*
             #[proc_macro_derive($func)]
-            pub fn $func(input: $crate::TokenStream) -> $crate::TokenStream {
+            pub fn $func(input: proc_macro_tokenstream!()) -> proc_macro_tokenstream!() {
                 let source = input.to_string();
                 let source = source.trim();
 
@@ -88,7 +108,7 @@ macro_rules! proc_macro_item_impl {
         $(
             $( #[$attr] )*
             #[proc_macro_derive($func)]
-            pub fn $func(input: $crate::TokenStream) -> $crate::TokenStream {
+            pub fn $func(input: proc_macro_tokenstream!()) -> proc_macro_tokenstream!() {
                 let source = input.to_string();
                 let source = source.trim();
 
