@@ -1,3 +1,154 @@
+//! ## Defining procedural macros
+//!
+//! Two crates are required to define a macro.
+//!
+//! ### The declaration crate
+//!
+//! This crate is allowed to contain other public things if you need, for example
+//! traits or functions or ordinary macros.
+//!
+//! https://github.com/dtolnay/proc-macro-hack/tree/master/demo-hack
+//!
+//! ```rust
+//! #[macro_use]
+//! extern crate proc_macro_hack;
+//!
+//! #[allow(unused_imports)]
+//! #[macro_use]
+//! extern crate demo_hack_impl;
+//! pub use demo_hack_impl::*;
+//!
+//! /// Add one to an expression.
+//! proc_macro_expr_decl!(add_one! => add_one_impl);
+//!
+//! /// A function that always returns 2.
+//! proc_macro_item_decl!(two_fn! => two_fn_impl);
+//! ```
+//!
+//! ### The implementation crate
+//!
+//! This crate must contain nothing but procedural macros. Private helper functions
+//! and private modules are fine but nothing can be public.
+//!
+//! https://github.com/dtolnay/proc-macro-hack/tree/master/demo-hack-impl
+//!
+//! ```rust
+//! #[macro_use]
+//! extern crate proc_macro_hack;
+//!
+//! proc_macro_expr_impl! {
+//!     /// Add one to an expression.
+//!     pub fn add_one_impl(input: &str) -> String {
+//!         format!("1 + {}", input)
+//!     }
+//! }
+//!
+//! proc_macro_item_impl! {
+//!     /// A function that always returns 2.
+//!     pub fn two_fn_impl(input: &str) -> String {
+//!         format!("fn {}() -> u8 {{ 2 }}", input)
+//!     }
+//! }
+//! ```
+//!
+//! Both crates depend on `proc-macro-hack`:
+//!
+//! ```toml
+//! [dependencies]
+//! proc-macro-hack = "0.3"
+//! ```
+//!
+//! Additionally, your implementation crate (but not your declaration crate) is a
+//! proc macro:
+//!
+//! ```toml
+//! [lib]
+//! proc-macro = true
+//! ```
+//!
+//! ## Using procedural macros
+//!
+//! Users of your crate depend on your declaration crate (not your implementation
+//! crate), then use your procedural macros as though it were magic. They even get
+//! reasonable error messages if your procedural macro panics.
+//!
+//! https://github.com/dtolnay/proc-macro-hack/tree/master/example
+//!
+//! ```rust
+//! #[macro_use]
+//! extern crate demo_hack;
+//!
+//! two_fn!(two);
+//!
+//! fn main() {
+//!     let x = two();
+//!     let nine = add_one!(x) + add_one!(2 + 3);
+//!     println!("nine = {}", nine);
+//! }
+//! ```
+//!
+//! ---
+//!
+//! # Expansion of expression macros
+//!
+//! ```rust,ignore
+//! m!(ARGS)
+//! ```
+//!
+//! ... expands to ...
+//!
+//! ```rust,ignore
+//! {
+//!     #[derive(m_impl)]
+//!     #[allow(unused)]
+//!     enum ProcMacroHack {
+//!         Input = (stringify!(ARGS), 0).1,
+//!     }
+//!     proc_macro_call!()
+//! }
+//! ```
+//!
+//! ... expands to ...
+//!
+//! ```rust,ignore
+//! {
+//!     macro_rules! proc_macro_call {
+//!         () => { RESULT }
+//!     }
+//!     proc_macro_call!()
+//! }
+//! ```
+//!
+//! ... expands to ...
+//!
+//! ```rust,ignore
+//! {
+//!     RESULT
+//! }
+//! ```
+//!
+//! # Expansion of item macros
+//!
+//! ```rust,ignore
+//! m!(ARGS);
+//! ```
+//!
+//! ... expands to ...
+//!
+//! ```rust,ignore
+//! #[derive(m_impl)]
+//! #[allow(unused)]
+//! enum ProcMacroHack {
+//!     Input = (stringify!(ARGS), 0).1,
+//! }
+//! ```
+//!
+//! ... expands to ...
+//!
+//! ```rust,ignore
+//! RESULT
+//! ```
+
 #[cfg(feature = "proc_macro")]
 extern crate proc_macro;
 
