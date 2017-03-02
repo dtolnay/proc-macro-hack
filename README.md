@@ -105,16 +105,18 @@ fn main() {
 
 ## Limitations
 
-- The input to your macro cannot contain dollar signs.
-- Your macro must expand to either an expression or zero-or-more items, cannot
-  sometimes be one or the other depending on input.
 - An item macro cannot be invoked multiple times within the same scope
-  ([#2][multiple]).
+  ([#2][issue-2]).
 - An expression macro cannot expand into recursive calls to itself
-  ([#4][recursive]).
+  ([#4][issue-4]).
+- The input to your macro cannot contain dollar signs ([#8][issue-8]).
+- Your macro must expand to either an expression or zero-or-more items, cannot
+  sometimes be one or the other depending on input ([#9][issue-9]).
 
-[multiple]: https://github.com/dtolnay/proc-macro-hack/issues/2
-[recursive]: https://github.com/dtolnay/proc-macro-hack/issues/4
+[issue-2]: https://github.com/dtolnay/proc-macro-hack/issues/2
+[issue-4]: https://github.com/dtolnay/proc-macro-hack/issues/4
+[issue-8]: https://github.com/dtolnay/proc-macro-hack/issues/8
+[issue-9]: https://github.com/dtolnay/proc-macro-hack/issues/9
 
 ## License
 
