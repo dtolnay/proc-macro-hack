@@ -30,6 +30,7 @@ https://github.com/dtolnay/proc-macro-hack/tree/master/demo-hack
 #[macro_use]
 extern crate proc_macro_hack;
 
+#[allow(unused_imports)]
 #[macro_use]
 extern crate demo_hack_impl;
 pub use demo_hack_impl::*;
