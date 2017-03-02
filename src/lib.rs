@@ -9,7 +9,7 @@
 //!
 //! https://github.com/dtolnay/proc-macro-hack/tree/master/demo-hack
 //!
-//! ```rust
+//! ```rust,ignore
 //! #[macro_use]
 //! extern crate proc_macro_hack;
 //!
@@ -32,7 +32,7 @@
 //!
 //! https://github.com/dtolnay/proc-macro-hack/tree/master/demo-hack-impl
 //!
-//! ```rust
+//! ```rust,ignore
 //! #[macro_use]
 //! extern crate proc_macro_hack;
 //!
@@ -74,7 +74,7 @@
 //!
 //! https://github.com/dtolnay/proc-macro-hack/tree/master/example
 //!
-//! ```rust
+//! ```rust,ignore
 //! #[macro_use]
 //! extern crate demo_hack;
 //!
