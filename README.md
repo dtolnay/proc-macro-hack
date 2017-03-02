@@ -6,14 +6,11 @@ Procedural functionlike!() macros using only Macros 1.1
 
 Did you think Macros 1.1 was only for custom derives? Think again.
 
-*Note:* Requires stable Rust 1.15 or beta Rust 1.16. This library is currently
-affected by a regression in rustc, [rust-lang/rust#39889][regression], and does
-not work on the most recent nightlies. It works on stable and beta but not
-nightly. How times have changed, huh? A fix has been merged in
-[rust-lang/rust#39419][fix] and should be in the next nightly after March 1.
+*Note:* Requires stable Rust 1.15, beta Rust 1.16, or nightly Rust 1.17 with a
+date 2017-03-01 or later due to a regression affecting earlier 1.17 nightlies
+([rust-lang/rust#39889][regression]).
 
 [regression]: https://github.com/rust-lang/rust/issues/39889
-[fix]: https://github.com/rust-lang/rust/issues/39419
 
 ## Defining procedural macros
 
