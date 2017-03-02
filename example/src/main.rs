@@ -1,4 +1,5 @@
-#[macro_use] extern crate demo_hack;
+#[macro_use]
+extern crate demo_hack;
 
 two_fn!(two);
 
