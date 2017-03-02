@@ -9,9 +9,11 @@ Did you think Macros 1.1 was only for custom derives? Think again.
 *Note:* Requires stable Rust 1.15 or beta Rust 1.16. This library is currently
 affected by a regression in rustc, [rust-lang/rust#39889][regression], and does
 not work on the most recent nightlies. It works on stable and beta but not
-nightly. How times have changed, huh?
+nightly. How times have changed, huh? A fix has been merged in
+[rust-lang/rust#39419][fix] and should be in the next nightly after March 1.
 
 [regression]: https://github.com/rust-lang/rust/issues/39889
+[fix]: https://github.com/rust-lang/rust/issues/39419
 
 ## Defining procedural macros
 
