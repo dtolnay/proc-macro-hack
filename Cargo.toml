@@ -12,3 +12,7 @@ proc_macro = []
 
 [dependencies]
 proc-macro-hack-impl = { version = "0.3", path = "impl" }
+
+[dev-dependencies]
+demo-hack = "0.0.3"
+demo-hack-impl = "0.0.3"

@@ -9,7 +9,7 @@
 //!
 //! https://github.com/dtolnay/proc-macro-hack/tree/master/demo-hack
 //!
-//! ```rust,ignore
+//! ```rust
 //! #[macro_use]
 //! extern crate proc_macro_hack;
 //!
@@ -28,6 +28,7 @@
 //!     /// A function that always returns 2.
 //!     two_fn! => two_fn_impl
 //! }
+//! # fn main() {}
 //! ```
 //!
 //! ### The implementation crate
@@ -79,7 +80,7 @@
 //!
 //! https://github.com/dtolnay/proc-macro-hack/tree/master/example
 //!
-//! ```rust,ignore
+//! ```rust
 //! #[macro_use]
 //! extern crate demo_hack;
 //!
@@ -191,11 +192,13 @@ macro_rules! proc_macro_tokenstream {
 
 /// Declare a hacky procedural macro that expands to an expression.
 ///
-/// ```rust,ignore
+/// ```rust
+/// # #[macro_use] extern crate proc_macro_hack;
 /// proc_macro_expr_decl! {
 ///     /// Add one to an expression.
 ///     add_one! => add_one_impl
 /// }
+/// # fn main() {}
 /// ```
 #[macro_export]
 macro_rules! proc_macro_expr_decl {
@@ -229,11 +232,13 @@ macro_rules! proc_macro_expr_decl_helper {
 
 /// Declare a hacky procedural macro that expands to items.
 ///
-/// ```rust,ignore
+/// ```rust
+/// # #[macro_use] extern crate proc_macro_hack;
 /// proc_macro_item_decl! {
 ///     /// A function that always returns 2.
 ///     two_fn! => two_fn_impl
 /// }
+/// # fn main() {}
 /// ```
 #[macro_export]
 macro_rules! proc_macro_item_decl {
