@@ -1,15 +1,22 @@
 extern crate proc_macro;
 use proc_macro::TokenStream;
 
+struct Hack {
+    attrs: String,
+    name: String,
+    name_impl: String,
+}
+
 #[proc_macro_derive(ProcMacroHackExpr)]
 pub fn hack_expr(input: TokenStream) -> TokenStream {
-    let (name, name_impl) = names(input);
+    let hack = parse(input);
 
     let rules = format!("
+        {attrs}
         #[macro_export]
-        macro_rules! {} {{
+        macro_rules! {name} {{
             ($($tt:tt)*) => {{{{
-                #[derive({})]
+                #[derive({name_impl})]
                 #[allow(unused)]
                 enum ProcMacroHack {{
                     Input = (stringify!($($tt)*), 0).1
@@ -18,27 +25,28 @@ pub fn hack_expr(input: TokenStream) -> TokenStream {
                 proc_macro_call!()
             }}}}
         }}
-    ", name, name_impl);
+    ", attrs=hack.attrs, name=hack.name, name_impl=hack.name_impl);
 
     rules.parse().unwrap()
 }
 
 #[proc_macro_derive(ProcMacroHackItem)]
 pub fn hack_item(input: TokenStream) -> TokenStream {
-    let (name, name_impl) = names(input);
+    let hack = parse(input);
 
     let rules = format!("
+        {attrs}
         #[macro_export]
-        macro_rules! {} {{
+        macro_rules! {name} {{
             ($($tt:tt)*) => {{
-                #[derive({})]
+                #[derive({name_impl})]
                 #[allow(unused)]
                 enum ProcMacroHack {{
                     Input = (stringify!($($tt)*), 0).1
                 }}
             }}
         }}
-    ", name, name_impl);
+    ", attrs=hack.attrs, name=hack.name, name_impl=hack.name_impl);
 
     rules.parse().unwrap()
 }
@@ -47,22 +55,35 @@ pub fn hack_item(input: TokenStream) -> TokenStream {
 ///
 /// ```rust,ignore
 /// #[allow(unused, non_camel_case_types)]
+/// $( #[$attr] )*
 /// enum NAME {
 ///     NAME_IMPL
 /// }
 /// ```
-fn names(input: TokenStream) -> (String, String) {
+fn parse(input: TokenStream) -> Hack {
     let source = input.to_string();
 
-    let mut words = source.split_whitespace();
-    assert_eq!(Some("#[allow(unused,"), words.next());
-    assert_eq!(Some("non_camel_case_types)]"), words.next());
-    assert_eq!(Some("enum"), words.next());
-    let name = words.next().unwrap();
-    assert_eq!(Some("{"), words.next());
-    let name_impl = words.next().unwrap();
-    assert_eq!(Some("}"), words.next());
-    assert_eq!(None, words.next());
+    let mut front = source.split_whitespace();
+    assert_eq!(Some("#[allow(unused,"), front.next());
+    assert_eq!(Some("non_camel_case_types)]"), front.next());
 
-    (name.to_owned(), name_impl.to_owned())
+    let mut back = source.split_whitespace().rev();
+    assert_eq!(Some("}"), back.next());
+    let name_impl = back.next().unwrap();
+    assert_eq!(Some("{"), back.next());
+    let name = back.next().unwrap();
+    assert_eq!(Some("enum"), back.next());
+
+    let start_attrs = source.find(']').unwrap() + 1;
+    let end = source.rfind('}').unwrap();
+    let end = source[..end].rfind(name_impl).unwrap();
+    let end = source[..end].rfind('{').unwrap();
+    let end = source[..end].rfind(name).unwrap();
+    let end = source[..end].rfind("enum").unwrap();
+
+    Hack {
+        attrs: source[start_attrs..end].trim().to_owned(),
+        name: name.to_owned(),
+        name_impl: name_impl.to_owned(),
+    }
 }

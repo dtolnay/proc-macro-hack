@@ -18,11 +18,15 @@
 //! extern crate demo_hack_impl;
 //! pub use demo_hack_impl::*;
 //!
-//! /// Add one to an expression.
-//! proc_macro_expr_decl!(add_one! => add_one_impl);
+//! proc_macro_expr_decl! {
+//!     /// Add one to an expression.
+//!     add_one! => add_one_impl
+//! }
 //!
-//! /// A function that always returns 2.
-//! proc_macro_item_decl!(two_fn! => two_fn_impl);
+//! proc_macro_item_decl! {
+//!     /// A function that always returns 2.
+//!     two_fn! => two_fn_impl
+//! }
 //! ```
 //!
 //! ### The implementation crate
@@ -185,24 +189,62 @@ macro_rules! proc_macro_tokenstream {
 
 #[macro_export]
 macro_rules! proc_macro_expr_decl {
+    (#[$attr:meta] $($rest:tt)+) => {
+        proc_macro_expr_decl_helper!((#[$attr]) $($rest)+);
+    };
     ($name:ident ! => $name_impl:ident) => {
+        proc_macro_expr_decl_helper!(() $name ! => $name_impl);
+    };
+}
+
+#[doc(hidden)]
+#[macro_export]
+macro_rules! proc_macro_expr_decl_helper {
+    (($($attrs:tt)*) #[$first:meta] $($rest:tt)+) => {
+        proc_macro_expr_decl_helper!(($($attrs)* #[$first]) $($rest)+);
+    };
+    (($($attrs:tt)*) $name:ident ! => $name_impl:ident) => {
         #[derive(ProcMacroHackExpr)]
         #[allow(unused, non_camel_case_types)]
+        $($attrs)*
         enum $name {
             $name_impl
         }
-    }
+    };
+    (($($attrs:tt)*) $name:ident ! => $name_impl:ident #[$first:meta] $($rest:tt)+) => {
+        proc_macro_expr_decl_helper!(($($attrs)*) $name ! => $name_impl);
+        proc_macro_expr_decl_helper!((#[$first]) $($rest)+);
+    };
 }
 
 #[macro_export]
 macro_rules! proc_macro_item_decl {
+    (#[$attr:meta] $($rest:tt)+) => {
+        proc_macro_item_decl_helper!((#[$attr]) $($rest)+);
+    };
     ($name:ident ! => $name_impl:ident) => {
+        proc_macro_item_decl_helper!(() $name ! => $name_impl);
+    };
+}
+
+#[doc(hidden)]
+#[macro_export]
+macro_rules! proc_macro_item_decl_helper {
+    (($($attrs:tt)*) #[$first:meta] $($rest:tt)+) => {
+        proc_macro_item_decl_helper!(($($attrs)* #[$first]) $($rest)+);
+    };
+    (($($attrs:tt)*) $name:ident ! => $name_impl:ident) => {
         #[derive(ProcMacroHackItem)]
         #[allow(unused, non_camel_case_types)]
+        $($attrs)*
         enum $name {
             $name_impl
         }
-    }
+    };
+    (($($attrs:tt)*) $name:ident ! => $name_impl:ident #[$first:meta] $($rest:tt)+) => {
+        proc_macro_item_decl_helper!(($($attrs)*) $name ! => $name_impl);
+        proc_macro_item_decl_helper!((#[$first]) $($rest)+);
+    };
 }
 
 #[macro_export]
