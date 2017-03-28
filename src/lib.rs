@@ -178,7 +178,7 @@ pub use proc_macro::TokenStream;
 macro_rules! proc_macro_tokenstream {
     () => {
         $crate::TokenStream
-    }
+    };
 }
 
 #[cfg(not(feature = "proc_macro"))]
@@ -187,7 +187,7 @@ macro_rules! proc_macro_tokenstream {
 macro_rules! proc_macro_tokenstream {
     () => {
         ::proc_macro::TokenStream
-    }
+    };
 }
 
 /// Declare a hacky procedural macro that expands to an expression.
@@ -330,7 +330,7 @@ macro_rules! proc_macro_expr_impl {
                 ", func(tokens)).parse().unwrap()
             }
         )+
-    }
+    };
 }
 
 /// Implement a hacky procedural macro that expands to items.
@@ -387,5 +387,5 @@ macro_rules! proc_macro_item_impl {
                 func(tokens).parse().unwrap()
             }
         )+
-    }
+    };
 }
