@@ -16,6 +16,7 @@
 //! #[allow(unused_imports)]
 //! #[macro_use]
 //! extern crate demo_hack_impl;
+//! #[doc(hidden)]
 //! pub use demo_hack_impl::*;
 //!
 //! proc_macro_expr_decl! {
@@ -163,6 +164,7 @@ extern crate proc_macro;
 #[allow(unused_imports)]
 #[macro_use]
 extern crate proc_macro_hack_impl;
+#[doc(hidden)]
 pub use proc_macro_hack_impl::*;
 
 #[cfg(feature = "proc_macro")]
