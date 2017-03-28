@@ -189,6 +189,14 @@ macro_rules! proc_macro_tokenstream {
     }
 }
 
+/// Declare a hacky procedural macro that expands to an expression.
+///
+/// ```rust,ignore
+/// proc_macro_expr_decl! {
+///     /// Add one to an expression.
+///     add_one! => add_one_impl
+/// }
+/// ```
 #[macro_export]
 macro_rules! proc_macro_expr_decl {
     (#[$attr:meta] $($rest:tt)+) => {
@@ -219,6 +227,14 @@ macro_rules! proc_macro_expr_decl_helper {
     };
 }
 
+/// Declare a hacky procedural macro that expands to items.
+///
+/// ```rust,ignore
+/// proc_macro_item_decl! {
+///     /// A function that always returns 2.
+///     two_fn! => two_fn_impl
+/// }
+/// ```
 #[macro_export]
 macro_rules! proc_macro_item_decl {
     (#[$attr:meta] $($rest:tt)+) => {
@@ -249,6 +265,16 @@ macro_rules! proc_macro_item_decl_helper {
     };
 }
 
+/// Implement a hacky procedural macro that expands to an expression.
+///
+/// ```rust,ignore
+/// proc_macro_expr_impl! {
+///     /// Add one to an expression.
+///     pub fn add_one_impl(input: &str) -> String {
+///         format!("1 + {}", input)
+///     }
+/// }
+/// ```
 #[macro_export]
 macro_rules! proc_macro_expr_impl {
     ($(
@@ -302,6 +328,16 @@ macro_rules! proc_macro_expr_impl {
     }
 }
 
+/// Implement a hacky procedural macro that expands to items.
+///
+/// ```rust,ignore
+/// proc_macro_item_impl! {
+///     /// A function that always returns 2.
+///     pub fn two_fn_impl(input: &str) -> String {
+///         format!("fn {}() -> u8 {{ 2 }}", input)
+///     }
+/// }
+/// ```
 #[macro_export]
 macro_rules! proc_macro_item_impl {
     ($(
