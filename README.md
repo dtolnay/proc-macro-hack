@@ -27,6 +27,8 @@ https://github.com/dtolnay/proc-macro-hack/tree/master/demo-hack
 #[macro_use]
 extern crate proc_macro_hack;
 
+// This is what allows the users to depend on just your
+// declaration crate rather than both crates.
 #[allow(unused_imports)]
 #[macro_use]
 extern crate demo_hack_impl;
