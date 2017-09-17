@@ -47,6 +47,12 @@ proc_macro_item_decl! {
 This crate must contain nothing but procedural macros. Private helper functions
 and private modules are fine but nothing can be public.
 
+A less trivial macro would probably use the [`syn`] crate to parse its input and
+the [`quote`] crate to generate the output.
+
+[`syn`]: https://github.com/dtolnay/syn
+[`quote`]: https://github.com/dtolnay/quote
+
 https://github.com/dtolnay/proc-macro-hack/tree/master/demo-hack-impl
 
 ```rust
