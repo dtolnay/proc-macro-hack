@@ -104,6 +104,32 @@ fn main() {
 }
 ```
 
+## Crates based on this approach
+
+- [`indoc`] – Macro that allows the content of string literals to be indented in
+  source code.
+- [`structure`] – Macro that uses a format string to create strongly-typed data
+  pack/unpack interfaces.
+- [`bstring`] – Macro for formatting byte strings.
+- [`wstr`] – Macros for compile-time UTF-16 (wide) string literals.
+- [`hexf`] – Macros that enable hexadecimal floating point literals.
+- [`binary_macros`] – Macros for decoding base64 and hexadecimal-like encodings
+  from string literals to [u8] literals at compile time.
+- [`autoimpl`] – Macro to generate a default blanket impl for a generic trait.
+- [`array-macro`] – Macro for concisely building large arrays.
+- [`reql`] – Includes a macro to splice an array of ReQL arguments into another
+  term.
+
+[`indoc`]: https://github.com/dtolnay/indoc
+[`structure`]: https://docs.rs/structure/0.1.1/structure/
+[`bstring`]: https://github.com/murarth/bstring
+[`wstr`]: https://github.com/nitric1/wstr-rs
+[`hexf`]: https://github.com/lifthrasiir/hexf
+[`binary_macros`]: https://github.com/golddranks/binary_macros
+[`autoimpl`]: https://github.com/blakepettersson/autoimpl
+[`array-macro`]: https://docs.rs/array-macro/0.1.1/array_macro/
+[`reql`]: https://docs.rs/reql/0.0.8/reql/macro.args.html
+
 ## Limitations
 
 - An item macro cannot be invoked multiple times within the same scope ([#2]).
