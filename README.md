@@ -117,6 +117,8 @@ fn main() {
 - [`structure`] – Macro that uses a format string to create strongly-typed data
   pack/unpack interfaces.
 - [`bstring`] – Macro for formatting byte strings.
+- [`net-literals`] – Macros for writing IP/socket address literals that are
+  checked for validity at compile time.
 - [`wstr`] – Macros for compile-time UTF-16 (wide) string literals.
 - [`hexf`] – Macros that enable hexadecimal floating point literals.
 - [`binary_macros`] – Macros for decoding base64 and hexadecimal-like encodings
@@ -129,6 +131,7 @@ fn main() {
 [`indoc`]: https://github.com/dtolnay/indoc
 [`structure`]: https://docs.rs/structure/0.1.1/structure/
 [`bstring`]: https://github.com/murarth/bstring
+[`net-literals`]: https://github.com/canndrew/net-literals
 [`wstr`]: https://github.com/nitric1/wstr-rs
 [`hexf`]: https://github.com/lifthrasiir/hexf
 [`binary_macros`]: https://github.com/golddranks/binary_macros
