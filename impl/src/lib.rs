@@ -22,7 +22,7 @@ pub fn hack_expr(input: TokenStream) -> TokenStream {
                     Input = (stringify!($($tt)*), 0).1
                 }}
 
-                proc_macro_call!()
+                proc_macro_call!($crate)
             }}}}
         }}
     ", attrs=hack.attrs, name=hack.name, name_impl=hack.name_impl);

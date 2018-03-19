@@ -304,11 +304,11 @@ macro_rules! proc_macro_expr_impl {
 
                 format!("
                     macro_rules! proc_macro_call {{
-                        () => {{
+                        ($proc_macro_hack_crate:tt) => {{
                             {}
                         }}
                     }}
-                ", func(tokens)).parse().unwrap()
+                ", func(tokens).replace("$crate", "$proc_macro_hack_crate")).parse().unwrap()
             }
         )+
     };
