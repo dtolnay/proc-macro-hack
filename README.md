@@ -146,6 +146,8 @@ fn main() {
 - Your macro must expand to either an expression or zero-or-more items, cannot
   sometimes be one or the other depending on input ([#9]).
 - Type macros are not supported ([#10]).
+- Input to an expression macro may not refer to hygienic identifiers of local
+  variables ([#15]).
 - An item macro cannot be used as an item in an impl block ([#18]).
 
 [#2]: https://github.com/dtolnay/proc-macro-hack/issues/2
@@ -153,6 +155,7 @@ fn main() {
 [#8]: https://github.com/dtolnay/proc-macro-hack/issues/8
 [#9]: https://github.com/dtolnay/proc-macro-hack/issues/9
 [#10]: https://github.com/dtolnay/proc-macro-hack/issues/10
+[#15]: https://github.com/dtolnay/proc-macro-hack/issues/15
 [#18]: https://github.com/dtolnay/proc-macro-hack/issues/18
 
 ## License
