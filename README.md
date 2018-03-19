@@ -150,6 +150,7 @@ fn main() {
   variables ([#15]).
 - An item macro cannot be used as an item in an impl block ([#18]).
 - Macro output may not refer to the special metavariable `$crate` ([#19]).
+- Pattern macros are not supported ([#20]).
 
 [#2]: https://github.com/dtolnay/proc-macro-hack/issues/2
 [#4]: https://github.com/dtolnay/proc-macro-hack/issues/4
@@ -159,6 +160,7 @@ fn main() {
 [#15]: https://github.com/dtolnay/proc-macro-hack/issues/15
 [#18]: https://github.com/dtolnay/proc-macro-hack/issues/18
 [#19]: https://github.com/dtolnay/proc-macro-hack/issues/19
+[#20]: https://github.com/dtolnay/proc-macro-hack/issues/20
 
 ## License
 
