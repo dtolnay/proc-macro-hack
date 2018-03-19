@@ -11,6 +11,8 @@ extern crate demo_hack_impl;
 #[doc(hidden)]
 pub use demo_hack_impl::*;
 
+pub const ONE: u8 = 1;
+
 proc_macro_expr_decl! {
     /// Add one to an expression.
     add_one! => add_one_impl
