@@ -123,7 +123,6 @@ fn main() {
 - [`binary_macros`] – Macros for decoding base64 and hexadecimal-like encodings
   from string literals to [u8] literals at compile time.
 - [`autoimpl`] – Macro to generate a default blanket impl for a generic trait.
-- [`array-macro`] – Macro for concisely building large arrays.
 - [`reql`] – Includes a macro to splice an array of ReQL arguments into another
   term.
 
@@ -135,7 +134,6 @@ fn main() {
 [`hexf`]: https://github.com/lifthrasiir/hexf
 [`binary_macros`]: https://github.com/golddranks/binary_macros
 [`autoimpl`]: https://github.com/blakepettersson/autoimpl
-[`array-macro`]: https://docs.rs/array-macro/0.1.1/array_macro/
 [`reql`]: https://docs.rs/reql/0.0.8/reql/macro.args.html
 
 ## Limitations
