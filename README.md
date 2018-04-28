@@ -111,6 +111,7 @@ fn main() {
 
 ## Crates based on this approach
 
+- [`mashup`] – A stable approach to concatenating identifiers.
 - [`indoc`] – Macro that allows the content of string literals to be indented in
   source code.
 - [`structure`] – Macro that uses a format string to create strongly-typed data
@@ -126,6 +127,7 @@ fn main() {
 - [`reql`] – Includes a macro to splice an array of ReQL arguments into another
   term.
 
+[`mashup`]: https://github.com/dtolnay/mashup
 [`indoc`]: https://github.com/dtolnay/indoc
 [`structure`]: https://docs.rs/structure/0.1.1/structure/
 [`bstring`]: https://github.com/murarth/bstring
