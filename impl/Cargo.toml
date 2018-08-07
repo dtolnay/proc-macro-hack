@@ -8,3 +8,6 @@ repository = "https://github.com/dtolnay/proc-macro-hack"
 
 [lib]
 proc-macro = true
+
+[badges]
+travis-ci = { repository = "dtolnay/proc-macro-hack" }

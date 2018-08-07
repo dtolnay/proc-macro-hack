@@ -12,3 +12,6 @@ proc-macro-hack-impl = { version = "0.4", path = "impl" }
 [dev-dependencies]
 demo-hack = { version = "0.0.4", path = "demo-hack" }
 demo-hack-impl = { version = "0.0.4", path = "demo-hack-impl" }
+
+[badges]
+travis-ci = { repository = "dtolnay/proc-macro-hack" }
