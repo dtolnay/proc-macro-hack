@@ -156,6 +156,8 @@
 //! RESULT
 //! ```
 
+#![no_std]
+
 // Allow the "unused" #[macro_use] because there is a different un-ignorable
 // warning otherwise:
 //
