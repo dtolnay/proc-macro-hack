@@ -109,7 +109,7 @@ fn main() {
 }
 ```
 
-## Crates based on this approach
+## Some crates based on this approach
 
 - [`mashup`] – A stable approach to concatenating identifiers.
 - [`indoc`] – Macro that allows the content of string literals to be indented in
@@ -124,16 +124,25 @@ fn main() {
 - [`binary_macros`] – Macros for decoding base64 and hexadecimal-like encodings
   from string literals to [u8] literals at compile time.
 - [`autoimpl`] – Macro to generate a default blanket impl for a generic trait.
+- [`include_dir`] – Macro to embed an entire directory tree in your binary.
+- [`doubter`] – Macro for testing Rust code blocks in Markdown.
+- [`guid`] – Macro for notating GUID structs in literal syntax.
+- [`hex-literal`] – Macro for expressing byte arrays as hexadecimal string
+  literals.
 
 [`mashup`]: https://github.com/dtolnay/mashup
 [`indoc`]: https://github.com/dtolnay/indoc
-[`structure`]: https://docs.rs/structure/0.1.1/structure/
+[`structure`]: https://docs.rs/structure/0.1/structure/
 [`bstring`]: https://github.com/murarth/bstring
 [`net-literals`]: https://github.com/canndrew/net-literals
 [`wstr`]: https://github.com/nitric1/wstr-rs
 [`hexf`]: https://github.com/lifthrasiir/hexf
 [`binary_macros`]: https://github.com/golddranks/binary_macros
 [`autoimpl`]: https://github.com/blakepettersson/autoimpl
+[`include_dir`]: https://github.com/Michael-F-Bryan/include_dir
+[`doubter`]: https://github.com/ubnt-intrepid/doubter
+[`guid`]: https://github.com/dherman/guid
+[`hex-literal`]: https://docs.rs/hex-literal/0.1/hex_literal/
 
 ## Limitations
 
