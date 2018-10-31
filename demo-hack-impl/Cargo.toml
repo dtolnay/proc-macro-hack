@@ -11,3 +11,5 @@ proc-macro = true
 
 [dependencies]
 proc-macro-hack = { version = "0.4", path = ".." }
+quote = "0.6"
+syn = "0.15"

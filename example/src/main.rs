@@ -1,9 +1,8 @@
-#[macro_use]
 extern crate demo_hack;
-
-two_fn!(two);
+use demo_hack::add_one;
 
 fn main() {
-    let nine = add_one!(two()) + add_one!(2 + 3);
+    let two = 2;
+    let nine = add_one!(two) + add_one!(2 + 3);
     println!("nine = {}", nine);
 }

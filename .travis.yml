@@ -6,7 +6,6 @@ rust:
   - stable
   - beta
   - nightly
-  - 1.15.0
 
 script:
   - cd example && cargo run

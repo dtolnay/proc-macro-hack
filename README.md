@@ -1,77 +1,76 @@
-Procedural functionlike!() macros using only Macros 1.1
-=======================================================
+Procedural macros in expression position
+========================================
 
 [![Build Status](https://api.travis-ci.org/dtolnay/proc-macro-hack.svg?branch=master)](https://travis-ci.org/dtolnay/proc-macro-hack)
 [![Latest Version](https://img.shields.io/crates/v/proc-macro-hack.svg)](https://crates.io/crates/proc-macro-hack)
 
-Did you think Macros 1.1 was only for custom derives? Think again.
+As of Rust 1.30, the language supports user-defined function-like procedural
+macros. However these can only be invoked in item position, not in
+statements or expressions.
 
-This approach works with any Rust version >= 1.15.0.
+This crate implements an alternative type of procedural macro that can be
+invoked in statement or expression position.
 
-## Defining procedural macros
+This approach works with any stable or nightly Rust version 1.30+.
 
-Two crates are required to define a macro.
+# Defining procedural macros
 
-### The declaration crate
+Two crates are required to define a procedural macro.
 
-This crate is allowed to contain other public things if you need, for example
-traits or functions or ordinary macros.
+## The implementation crate
 
-https://github.com/dtolnay/proc-macro-hack/tree/master/demo-hack
+This crate must contain nothing but procedural macros. Private helper
+functions and private modules are fine but nothing can be public.
+
+[> example of an implementation crate][demo-hack-impl]
+
+Just like you would use a #\[proc_macro\] attribute to define a natively
+supported procedural macro, use proc-macro-hack's #\[proc_macro_hack\]
+attribute to define a procedural macro that works in expression position.
+The function signature is the same as for ordinary function-like procedural
+macros.
 
 ```rust
-#[macro_use]
+extern crate proc_macro;
 extern crate proc_macro_hack;
+extern crate quote;
+extern crate syn;
 
-// This is what allows the users to depend on just your
-// declaration crate rather than both crates.
-#[allow(unused_imports)]
-#[macro_use]
-extern crate demo_hack_impl;
-#[doc(hidden)]
-pub use demo_hack_impl::*;
+use proc_macro::TokenStream;
+use proc_macro_hack::proc_macro_hack;
+use quote::quote;
+use syn::{parse_macro_input, Expr};
 
-proc_macro_expr_decl! {
-    /// Add one to an expression.
-    add_one! => add_one_impl
-}
-
-proc_macro_item_decl! {
-    /// A function that always returns 2.
-    two_fn! => two_fn_impl
+/// Add one to an expression.
+#[proc_macro_hack]
+pub fn add_one(input: TokenStream) -> TokenStream {
+    let expr = parse_macro_input!(input as Expr);
+    TokenStream::from(quote! {
+        1 + (#expr)
+    })
 }
 ```
 
-### The implementation crate
+## The declaration crate
 
-This crate must contain nothing but procedural macros. Private helper functions
-and private modules are fine but nothing can be public.
+This crate is allowed to contain other public things if you need, for
+example traits or functions or ordinary macros.
 
-A less trivial macro would probably use the [`syn`] crate to parse its input and
-the [`quote`] crate to generate the output.
+[> example of a declaration crate][demo-hack]
 
-[`syn`]: https://github.com/dtolnay/syn
-[`quote`]: https://github.com/dtolnay/quote
-
-https://github.com/dtolnay/proc-macro-hack/tree/master/demo-hack-impl
+Within the declaration crate there needs to be a re-export of your
+procedural macro from the implementation crate. The re-export also carries a
+\#\[proc_macro_hack\] attribute.
 
 ```rust
-#[macro_use]
+extern crate demo_hack_impl;
 extern crate proc_macro_hack;
 
-proc_macro_expr_impl! {
-    /// Add one to an expression.
-    pub fn add_one_impl(input: &str) -> String {
-        format!("1 + {}", input)
-    }
-}
+use proc_macro_hack::proc_macro_hack;
 
-proc_macro_item_impl! {
-    /// A function that always returns 2.
-    pub fn two_fn_impl(input: &str) -> String {
-        format!("fn {}() -> u8 {{ 2 }}", input)
-    }
-}
+/// Add one to an expression.
+#[proc_macro_hack]
+pub use demo_hack_impl::add_one;
 ```
 
 Both crates depend on `proc-macro-hack`:
@@ -81,104 +80,49 @@ Both crates depend on `proc-macro-hack`:
 proc-macro-hack = "0.4"
 ```
 
-Additionally, your implementation crate (but not your declaration crate) is a
-proc macro:
+Additionally, your implementation crate (but not your declaration crate) is
+a proc macro crate:
 
 ```toml
 [lib]
 proc-macro = true
 ```
 
-## Using procedural macros
+# Using procedural macros
 
-Users of your crate depend on your declaration crate (not your implementation
-crate), then use your procedural macros as though it were magic. They even get
-reasonable error messages if your procedural macro panics.
+Users of your crate depend on your declaration crate (not your
+implementation crate), then use your procedural macros as usual.
 
-https://github.com/dtolnay/proc-macro-hack/tree/master/example
+[> example of a downstream crate][example]
 
 ```rust
-#[macro_use]
 extern crate demo_hack;
-
-two_fn!(two);
+use demo_hack::add_one;
 
 fn main() {
-    let nine = add_one!(two()) + add_one!(2 + 3);
+    let two = 2;
+    let nine = add_one!(two) + add_one!(2 + 3);
     println!("nine = {}", nine);
 }
 ```
 
-## Some crates based on this approach
+[demo-hack-impl]: https://github.com/dtolnay/proc-macro-hack/tree/master/demo-hack-impl
+[demo-hack]: https://github.com/dtolnay/proc-macro-hack/tree/master/demo-hack
+[example]: https://github.com/dtolnay/proc-macro-hack/tree/master/example
 
-- [`mashup`] – A stable approach to concatenating identifiers.
-- [`indoc`] – Macro that allows the content of string literals to be indented in
-  source code.
-- [`structure`] – Macro that uses a format string to create strongly-typed data
-  pack/unpack interfaces.
-- [`bstring`] – Macro for formatting byte strings.
-- [`net-literals`] – Macros for writing IP/socket address literals that are
-  checked for validity at compile time.
-- [`wstr`] – Macros for compile-time UTF-16 (wide) string literals.
-- [`hexf`] – Macros that enable hexadecimal floating point literals.
-- [`binary_macros`] – Macros for decoding base64 and hexadecimal-like encodings
-  from string literals to [u8] literals at compile time.
-- [`autoimpl`] – Macro to generate a default blanket impl for a generic trait.
-- [`include_dir`] – Macro to embed an entire directory tree in your binary.
-- [`doubter`] – Macro for testing Rust code blocks in Markdown.
-- [`guid`] – Macro for notating GUID structs in literal syntax.
-- [`hex-literal`] – Macro for expressing byte arrays as hexadecimal string
-  literals.
+<br>
 
-[`mashup`]: https://github.com/dtolnay/mashup
-[`indoc`]: https://github.com/dtolnay/indoc
-[`structure`]: https://docs.rs/structure/0.1/structure/
-[`bstring`]: https://github.com/murarth/bstring
-[`net-literals`]: https://github.com/canndrew/net-literals
-[`wstr`]: https://github.com/nitric1/wstr-rs
-[`hexf`]: https://github.com/lifthrasiir/hexf
-[`binary_macros`]: https://github.com/golddranks/binary_macros
-[`autoimpl`]: https://github.com/blakepettersson/autoimpl
-[`include_dir`]: https://github.com/Michael-F-Bryan/include_dir
-[`doubter`]: https://github.com/ubnt-intrepid/doubter
-[`guid`]: https://github.com/dherman/guid
-[`hex-literal`]: https://docs.rs/hex-literal/0.1/hex_literal/
+#### License
 
-## Limitations
+<sup>
+Licensed under either of <a href="LICENSE-APACHE">Apache License, Version
+2.0</a> or <a href="LICENSE-MIT">MIT license</a> at your option.
+</sup>
 
-- An item macro cannot be invoked multiple times within the same scope ([#2]).
-- An expression macro cannot expand into recursive calls to itself ([#4]).
-- The input to your macro cannot contain dollar signs ([#8]).
-- Your macro must expand to either an expression or zero-or-more items, cannot
-  sometimes be one or the other depending on input ([#9]).
-- Type macros are not supported ([#10]).
-- Input to an expression macro may not refer to hygienic identifiers of local
-  variables ([#15]).
-- An item macro cannot be used as an item in an impl block ([#18]).
-- Macro output may not refer to the special metavariable `$crate` ([#19]).
-- Pattern macros are not supported ([#20]).
+<br>
 
-[#2]: https://github.com/dtolnay/proc-macro-hack/issues/2
-[#4]: https://github.com/dtolnay/proc-macro-hack/issues/4
-[#8]: https://github.com/dtolnay/proc-macro-hack/issues/8
-[#9]: https://github.com/dtolnay/proc-macro-hack/issues/9
-[#10]: https://github.com/dtolnay/proc-macro-hack/issues/10
-[#15]: https://github.com/dtolnay/proc-macro-hack/issues/15
-[#18]: https://github.com/dtolnay/proc-macro-hack/issues/18
-[#19]: https://github.com/dtolnay/proc-macro-hack/issues/19
-[#20]: https://github.com/dtolnay/proc-macro-hack/issues/20
-
-## License
-
-Licensed under either of
-
- * Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
- * MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
-
-at your option.
-
-### Contribution
-
+<sub>
 Unless you explicitly state otherwise, any contribution intentionally submitted
 for inclusion in this hack by you, as defined in the Apache-2.0 license, shall
 be dual licensed as above, without any additional terms or conditions.
+</sub>
