@@ -1,6 +1,6 @@
 [package]
 name = "proc-macro-hack"
-version = "0.4.1"
+version = "0.5.0"
 authors = ["David Tolnay <dtolnay@gmail.com>"]
 license = "MIT/Apache-2.0"
 description = "Procedural functionlike!() macros in expression position"
@@ -15,8 +15,8 @@ quote = "0.6"
 syn = { version = "0.15", default-features = false, features = ["proc-macro", "parsing", "printing"] }
 
 [dev-dependencies]
-demo-hack = { version = "0.0.4", path = "demo-hack" }
-demo-hack-impl = { version = "0.0.4", path = "demo-hack-impl" }
+demo-hack = { version = "0.0.5", path = "demo-hack" }
+demo-hack-impl = { version = "0.0.5", path = "demo-hack-impl" }
 
 [badges]
 travis-ci = { repository = "dtolnay/proc-macro-hack" }

@@ -77,7 +77,7 @@ Both crates depend on `proc-macro-hack`:
 
 ```toml
 [dependencies]
-proc-macro-hack = "0.4"
+proc-macro-hack = "0.5"
 ```
 
 Additionally, your implementation crate (but not your declaration crate) is
