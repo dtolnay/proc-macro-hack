@@ -1,6 +1,6 @@
 [package]
 name = "proc-macro-hack"
-version = "0.5.0"
+version = "0.5.1"
 authors = ["David Tolnay <dtolnay@gmail.com>"]
 license = "MIT/Apache-2.0"
 description = "Procedural macros in expression position"
