@@ -13,11 +13,11 @@ invoked in statement or expression position.
 
 This approach works with any stable or nightly Rust version 1.30+.
 
-# Defining procedural macros
+## Defining procedural macros
 
 Two crates are required to define a procedural macro.
 
-## The implementation crate
+### The implementation crate
 
 This crate must contain nothing but procedural macros. Private helper
 functions and private modules are fine but nothing can be public.
@@ -51,7 +51,7 @@ pub fn add_one(input: TokenStream) -> TokenStream {
 }
 ```
 
-## The declaration crate
+### The declaration crate
 
 This crate is allowed to contain other public things if you need, for
 example traits or functions or ordinary macros.
@@ -88,7 +88,7 @@ a proc macro crate:
 proc-macro = true
 ```
 
-# Using procedural macros
+## Using procedural macros
 
 Users of your crate depend on your declaration crate (not your
 implementation crate), then use your procedural macros as usual.
