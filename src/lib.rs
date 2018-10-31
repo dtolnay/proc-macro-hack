@@ -126,10 +126,6 @@ use syn::{braced, bracketed, parenthesized, parse_macro_input, token, Ident, Tok
 
 type Visibility = Option<Token![pub]>;
 
-mod keyword {
-    syn::custom_keyword!(export);
-}
-
 enum Input {
     Export(Export),
     Define(Define),
