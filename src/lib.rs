@@ -418,9 +418,9 @@ fn actual_proc_macro_name(conceptual: &Ident) -> Ident {
 
 fn dummy_name_for_export(export: &Export) -> String {
     let mut dummy = String::new();
-    write!(dummy, "_{}{}", export.from.to_string().len(), export.from);
+    write!(dummy, "_{}{}", export.from.to_string().len(), export.from).unwrap();
     for m in &export.macros {
-        write!(dummy, "_{}{}", m.name.to_string().len(), m.name);
+        write!(dummy, "_{}{}", m.name.to_string().len(), m.name).unwrap();
     }
     dummy
 }
