@@ -108,7 +108,7 @@
 //! [demo-hack]: https://github.com/dtolnay/proc-macro-hack/tree/master/demo-hack
 //! [example]: https://github.com/dtolnay/proc-macro-hack/tree/master/example
 
-#![recursion_limit = "256"]
+#![recursion_limit = "512"]
 #![cfg_attr(feature = "cargo-clippy", allow(renamed_and_removed_lints))]
 #![cfg_attr(feature = "cargo-clippy", allow(needless_pass_by_value))]
 
@@ -241,13 +241,43 @@ fn parse_attributes(input: ParseStream) -> Result<TokenStream> {
 
 #[proc_macro_attribute]
 pub fn proc_macro_hack(
-    _args: proc_macro::TokenStream,
+    args: proc_macro::TokenStream,
     input: proc_macro::TokenStream,
 ) -> proc_macro::TokenStream {
     proc_macro::TokenStream::from(match parse_macro_input!(input) {
-        Input::Export(export) => expand_export(export),
-        Input::Define(define) => expand_define(define),
+        Input::Export(export) => {
+            let args = parse_macro_input!(args as ExportArgs);
+            expand_export(export, args)
+        }
+        Input::Define(define) => {
+            parse_macro_input!(args as DefineArgs);
+            expand_define(define)
+        }
     })
+}
+
+mod kw {
+    syn::custom_keyword!(support_nested);
+}
+
+struct ExportArgs {
+    support_nested: bool,
+}
+
+impl Parse for ExportArgs {
+    fn parse(input: ParseStream) -> Result<Self> {
+        Ok(ExportArgs {
+            support_nested: input.parse::<Option<kw::support_nested>>()?.is_some(),
+        })
+    }
+}
+
+struct DefineArgs;
+
+impl Parse for DefineArgs {
+    fn parse(_input: ParseStream) -> Result<Self> {
+        Ok(DefineArgs)
+    }
 }
 
 struct EnumHack {
@@ -290,7 +320,7 @@ pub fn enum_hack(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     proc_macro::TokenStream::from(inner.token_stream)
 }
 
-fn expand_export(export: Export) -> TokenStream {
+fn expand_export(export: Export, args: ExportArgs) -> TokenStream {
     let dummy = dummy_name_for_export(&export);
 
     let attrs = export.attrs;
@@ -303,6 +333,11 @@ fn expand_export(export: Export) -> TokenStream {
         Some(_) => quote!($crate::),
         None => quote!(),
     };
+    let enum_variant = if args.support_nested {
+        quote!(Nested)
+    } else {
+        quote!(Value)
+    };
 
     let from = export.from;
     let rules = export
@@ -312,12 +347,30 @@ fn expand_export(export: Export) -> TokenStream {
             let actual_name = actual_proc_macro_name(&name);
             let dispatch = dispatch_macro_name(&name);
 
+            let export_dispatch = if args.support_nested {
+                Some(quote! {
+                    #[doc(hidden)]
+                    #vis use proc_macro_nested::dispatch as #dispatch;
+                })
+            } else {
+                None
+            };
+
+            let proc_macro_call = if args.support_nested {
+                quote! {
+                    #crate_prefix #dispatch! { ($($proc_macro)*) }
+                }
+            } else {
+                quote! {
+                    proc_macro_call!()
+                }
+            };
+
             quote! {
                 #[doc(hidden)]
                 #vis use #from::#actual_name;
 
-                #[doc(hidden)]
-                #vis use proc_macro_nested::dispatch as #dispatch;
+                #export_dispatch
 
                 #attrs
                 #macro_export
@@ -325,9 +378,9 @@ fn expand_export(export: Export) -> TokenStream {
                     ($($proc_macro:tt)*) => {{
                         #[derive(#crate_prefix #actual_name)]
                         enum ProcMacroHack {
-                            Value = (stringify! { $($proc_macro)* }, 0).1,
+                            #enum_variant = (stringify! { $($proc_macro)* }, 0).1,
                         }
-                        #crate_prefix #dispatch! { ($($proc_macro)*) }
+                        #proc_macro_call
                     }};
                 }
             }
@@ -362,7 +415,8 @@ fn expand_define(define: Define) -> TokenStream {
                 #dummy::TokenTree::Group(group) => group.stream().into_iter(),
                 _ => unimplemented!(),
             };
-            braces.next().unwrap(); // `Value`
+            let variant = braces.next().unwrap(); // `Value` or `Nested`
+            let support_nested = variant.to_string() == "Nested";
             braces.next().unwrap(); // `=`
 
             let mut parens = match braces.next().unwrap() {
@@ -409,7 +463,11 @@ fn expand_define(define: Define) -> TokenStream {
                 ),
                 #dummy::TokenTree::Ident(
                     #dummy::Ident::new(
-                        &format!("proc_macro_call_{}", count_bangs(inner)),
+                        &if support_nested {
+                            format!("proc_macro_call_{}", count_bangs(inner))
+                        } else {
+                            String::from("proc_macro_call")
+                        },
                         #dummy::Span::call_site(),
                     ),
                 ),

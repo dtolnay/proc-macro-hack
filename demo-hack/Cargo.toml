@@ -8,5 +8,4 @@ repository = "https://github.com/dtolnay/proc-macro-hack"
 
 [dependencies]
 proc-macro-hack = { version = "0.5", path = ".." }
-proc-macro-nested = { path = "../nested" }
 demo-hack-impl = { version = "0.0.5", path = "../demo-hack-impl" }
