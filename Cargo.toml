@@ -24,4 +24,4 @@ demo-hack-impl = { version = "0.0.5", path = "demo-hack-impl" }
 travis-ci = { repository = "dtolnay/proc-macro-hack" }
 
 [workspace]
-members = ["demo-hack", "demo-hack-impl", "example"]
+members = ["demo-hack", "demo-hack-impl", "example", "nested"]
