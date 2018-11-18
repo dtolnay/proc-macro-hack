@@ -310,10 +310,14 @@ fn expand_export(export: Export) -> TokenStream {
         .into_iter()
         .map(|Macro { name, export_as }| {
             let actual_name = actual_proc_macro_name(&name);
+            let dispatch = dispatch_macro_name(&name);
 
             quote! {
                 #[doc(hidden)]
                 #vis use #from::#actual_name;
+
+                #[doc(hidden)]
+                #vis use proc_macro_nested::dispatch as #dispatch;
 
                 #attrs
                 #macro_export
@@ -323,7 +327,7 @@ fn expand_export(export: Export) -> TokenStream {
                         enum ProcMacroHack {
                             Value = (stringify! { $($proc_macro)* }, 0).1,
                         }
-                        proc_macro_call!()
+                        #crate_prefix #dispatch! { ($($proc_macro)*) }
                     }};
                 }
             }
@@ -373,7 +377,25 @@ fn expand_define(define: Define) -> TokenStream {
                 _ => unimplemented!(),
             };
 
-            let output: #dummy::TokenStream = #name(inner);
+            let output: #dummy::TokenStream = #name(inner.clone());
+
+            fn count_bangs(input: #dummy::TokenStream) -> usize {
+                let mut count = 0;
+                for token in input {
+                    match token {
+                        #dummy::TokenTree::Punct(punct) => {
+                            if punct.as_char() == '!' {
+                                count += 1;
+                            }
+                        }
+                        #dummy::TokenTree::Group(group) => {
+                            count += count_bangs(group.stream());
+                        }
+                        _ => {}
+                    }
+                }
+                count
+            }
 
             // macro_rules! proc_macro_call {
             //     () => { #output }
@@ -386,7 +408,10 @@ fn expand_define(define: Define) -> TokenStream {
                     #dummy::Punct::new('!', #dummy::Spacing::Alone),
                 ),
                 #dummy::TokenTree::Ident(
-                    #dummy::Ident::new("proc_macro_call", #dummy::Span::call_site()),
+                    #dummy::Ident::new(
+                        &format!("proc_macro_call_{}", count_bangs(inner)),
+                        #dummy::Span::call_site(),
+                    ),
                 ),
                 #dummy::TokenTree::Group(
                     #dummy::Group::new(#dummy::Delimiter::Brace, #dummy::TokenStream::from_iter(vec![
@@ -414,6 +439,11 @@ fn expand_define(define: Define) -> TokenStream {
 fn actual_proc_macro_name(conceptual: &Ident) -> Ident {
     let actual_name = format!("proc_macro_hack_{}", conceptual);
     Ident::new(&actual_name, Span::call_site())
+}
+
+fn dispatch_macro_name(conceptual: &Ident) -> Ident {
+    let dispatch = format!("proc_macro_call_{}", conceptual);
+    Ident::new(&dispatch, Span::call_site())
 }
 
 fn dummy_name_for_export(export: &Export) -> String {
