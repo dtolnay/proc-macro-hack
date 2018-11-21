@@ -32,6 +32,8 @@
 //! No change is required within your definition crate, only in the declaration
 //! crate.
 
+#![no_std]
+
 include!(concat!(env!("OUT_DIR"), "/count.rs"));
 
 #[doc(hidden)]
