@@ -8,4 +8,11 @@ rust:
   - nightly
 
 script:
-  - cd example && cargo run
+  - cargo run --manifest-path example/Cargo.toml
+
+matrix:
+  include:
+    - rust: nightly
+      name: Minimal versions
+      before_script:
+        - cargo update -Z minimal-versions --manifest-path example/Cargo.toml
