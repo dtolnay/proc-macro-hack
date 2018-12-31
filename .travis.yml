@@ -3,9 +3,10 @@ sudo: false
 language: rust
 
 rust:
-  - stable
-  - beta
   - nightly
+  - beta
+  - stable
+  - 1.30.0
 
 script:
   - cargo run --manifest-path example/Cargo.toml
