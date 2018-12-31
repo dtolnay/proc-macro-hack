@@ -103,6 +103,20 @@ fn main() {
 [demo-hack]: https://github.com/dtolnay/proc-macro-hack/tree/master/demo-hack
 [example]: https://github.com/dtolnay/proc-macro-hack/tree/master/example
 
+## Limitations
+
+- Only proc macros in expression position are supported. Proc macros in type
+  position ([#10]) or pattern position ([#20]) are not supported.
+
+- By default, nested invocations are not supported i.e. the code emitted by a
+  proc-macro-hack macro invocation cannot contain recursive calls to the same
+  proc-macro-hack macro nor calls to any other proc-macro-hack macros. Use
+  [`proc-macro-nested`] if you require support for nested invocations.
+
+[#10]: https://github.com/dtolnay/proc-macro-hack/issues/10
+[#20]: https://github.com/dtolnay/proc-macro-hack/issues/20
+[`proc-macro-nested`]: https://docs.rs/proc-macro-nested
+
 <br>
 
 #### License
