@@ -29,8 +29,8 @@
 //! # }
 //! ```
 //!
-//! No change is required within your definition crate, only in the declaration
-//! crate.
+//! No change is required within your definition crate, only to the re-export in
+//! the declaration crate.
 
 #![no_std]
 
