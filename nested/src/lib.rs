@@ -31,6 +31,14 @@
 //!
 //! No change is required within your definition crate, only to the re-export in
 //! the declaration crate.
+//!
+//! # Limitations
+//!
+//! - Nested invocations are preprocessed by a TT-muncher, so the caller's crate
+//!   will be required to contain `#![recursion_limit = "..."]` if there are
+//!   lengthy macro invocations.
+//!
+//! - Only up to 64 nested invocations are supported.
 
 #![no_std]
 

@@ -26,7 +26,7 @@ fn main() {
         #[macro_export]
         macro_rules! count {
     ";
-    for i in 0..50 {
+    for i in 0..=64 {
         let bangs = iter::repeat("!").take(i).collect::<String>();
         content += &format!("({}) => {{ proc_macro_call_{}!() }};", bangs, i);
     }
