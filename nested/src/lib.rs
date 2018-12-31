@@ -22,8 +22,6 @@
 //! ```rust
 //! // After
 //! # const IGNORE: &str = stringify! {
-//! extern crate proc_macro_nested;
-//!
 //! #[proc_macro_hack(support_nested)]
 //! pub use demo_hack_impl::add_one;
 //! # }

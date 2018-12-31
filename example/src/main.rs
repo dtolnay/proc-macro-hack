@@ -1,4 +1,3 @@
-extern crate demo_hack;
 use demo_hack::add_one;
 
 fn main() {

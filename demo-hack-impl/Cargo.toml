@@ -5,6 +5,7 @@ authors = ["David Tolnay <dtolnay@gmail.com>"]
 license = "MIT/Apache-2.0"
 description = "Demo of proc-macro-hack"
 repository = "https://github.com/dtolnay/proc-macro-hack"
+edition = "2018"
 
 [lib]
 proc-macro = true

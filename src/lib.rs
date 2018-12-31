@@ -24,9 +24,6 @@
 //!
 //! ```rust
 //! extern crate proc_macro;
-//! extern crate proc_macro_hack;
-//! extern crate quote;
-//! extern crate syn;
 //!
 //! use proc_macro::TokenStream;
 //! use proc_macro_hack::proc_macro_hack;
@@ -59,9 +56,6 @@
 //! \#\[proc_macro_hack\] attribute.
 //!
 //! ```rust
-//! extern crate demo_hack_impl;
-//! extern crate proc_macro_hack;
-//!
 //! use proc_macro_hack::proc_macro_hack;
 //!
 //! /// Add one to an expression.
@@ -94,7 +88,6 @@
 //! [> example of a downstream crate][example]
 //!
 //! ```rust
-//! extern crate demo_hack;
 //! use demo_hack::add_one;
 //!
 //! fn main() {
