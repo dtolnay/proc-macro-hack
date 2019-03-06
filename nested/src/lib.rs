@@ -60,6 +60,9 @@ macro_rules! dispatch {
     ((! $($rest:tt)*) $($bang:tt)*) => {
         $crate::dispatch!(($($rest)*) $($bang)* !)
     };
+    ((!= $($rest:tt)*) $($bang:tt)*) => {
+        $crate::dispatch!(($($rest)*) $($bang)* !)
+    };
     (($first:tt $($rest:tt)*) $($bang:tt)*) => {
         $crate::dispatch!(($($rest)*) $($bang)*)
     };
