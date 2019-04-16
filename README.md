@@ -38,7 +38,6 @@ use proc_macro_hack::proc_macro_hack;
 use quote::quote;
 use syn::{parse_macro_input, Expr};
 
-/// Add one to an expression.
 #[proc_macro_hack]
 pub fn add_one(input: TokenStream) -> TokenStream {
     let expr = parse_macro_input!(input as Expr);
@@ -63,6 +62,8 @@ procedural macro from the implementation crate. The re-export also carries a
 use proc_macro_hack::proc_macro_hack;
 
 /// Add one to an expression.
+///
+/// (Documentation goes here on the re-export, not in the other crate.)
 #[proc_macro_hack]
 pub use demo_hack_impl::add_one;
 ```
