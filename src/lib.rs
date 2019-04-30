@@ -22,7 +22,7 @@
 //! The function signature is the same as for ordinary function-like procedural
 //! macros.
 //!
-//! ```rust
+//! ```
 //! extern crate proc_macro;
 //!
 //! use proc_macro::TokenStream;
@@ -54,7 +54,7 @@
 //! procedural macro from the implementation crate. The re-export also carries a
 //! \#\[proc_macro_hack\] attribute.
 //!
-//! ```rust
+//! ```
 //! use proc_macro_hack::proc_macro_hack;
 //!
 //! /// Add one to an expression.
@@ -88,7 +88,7 @@
 //!
 //! [> example of a downstream crate][example]
 //!
-//! ```rust
+//! ```
 //! use demo_hack::add_one;
 //!
 //! fn main() {

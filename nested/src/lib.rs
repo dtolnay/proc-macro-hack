@@ -11,7 +11,7 @@
 //! your declaration crate and update the `#[proc_macro_hack]` re-export as
 //! follows.
 //!
-//! ```rust
+//! ```
 //! // Before
 //! # const IGNORE: &str = stringify! {
 //! #[proc_macro_hack]
@@ -19,7 +19,7 @@
 //! # }
 //! ```
 //!
-//! ```rust
+//! ```
 //! // After
 //! # const IGNORE: &str = stringify! {
 //! #[proc_macro_hack(support_nested)]
