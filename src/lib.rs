@@ -112,6 +112,12 @@
 //!   same proc-macro-hack macro nor calls to any other proc-macro-hack macros.
 //!   Use [`proc-macro-nested`] if you require support for nested invocations.
 //!
+//! - By default, hygiene is structured such that the expanded code can't refer
+//!   to local variables other than those passed by name somewhere in the macro
+//!   input. If your macro must refer to *local* variables that don't get named
+//!   in the macro input, use `#[proc_macro_hack(fake_call_site)]` on the
+//!   re-export in your declaration crate. *Most macros won't need this.*
+//!
 //! [#10]: https://github.com/dtolnay/proc-macro-hack/issues/10
 //! [#20]: https://github.com/dtolnay/proc-macro-hack/issues/20
 //! [`proc-macro-nested`]: https://docs.rs/proc-macro-nested
