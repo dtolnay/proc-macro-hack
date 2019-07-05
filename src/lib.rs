@@ -186,6 +186,7 @@ impl Parse for Export {
         let attrs = input.call(parse_attributes)?;
         let vis: Visibility = input.parse()?;
         input.parse::<Token![use]>()?;
+        input.parse::<Option<Token![::]>>()?;
         let from: Ident = input.parse()?;
         input.parse::<Token![::]>()?;
 
