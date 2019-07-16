@@ -64,7 +64,12 @@ fn parse(input: TokenStream) -> Hack {
     let source = input.to_string();
 
     let mut front = source.split_whitespace();
-    assert_eq!(Some("#[allow(unused,"), front.next());
+    let next = front.next().unwrap();
+    if next == "#[allow(unused" {
+        assert_eq!(Some(","), front.next());
+    } else {
+        assert_eq!("#[allow(unused,", next);
+    }
     assert_eq!(Some("non_camel_case_types)]"), front.next());
 
     let mut back = source.split_whitespace().rev();
