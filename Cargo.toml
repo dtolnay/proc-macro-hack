@@ -12,9 +12,9 @@ readme = "README.md"
 proc-macro = true
 
 [dependencies]
-proc-macro2 = "0.4.19"
-quote = "0.6.8"
-syn = "0.15.14"
+proc-macro2 = "1.0.0"
+quote = "1.0.0"
+syn = "1.0.0"
 
 [dev-dependencies]
 demo-hack = { version = "0.0.5", path = "demo-hack" }
