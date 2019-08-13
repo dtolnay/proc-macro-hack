@@ -134,7 +134,7 @@ extern crate syn;
 use std::fmt::Write;
 
 use proc_macro2::{Span, TokenStream, TokenTree};
-use quote::{quote, ToTokens};
+use quote::{format_ident, quote, ToTokens};
 use syn::parse::{Parse, ParseStream, Result};
 use syn::{braced, bracketed, parenthesized, parse_macro_input, token, Ident, Token};
 
@@ -603,18 +603,15 @@ fn expand_define(define: Define) -> TokenStream {
 }
 
 fn actual_proc_macro_name(conceptual: &Ident) -> Ident {
-    let actual_name = format!("proc_macro_hack_{}", conceptual);
-    Ident::new(&actual_name, Span::call_site())
+    format_ident!("proc_macro_hack_{}", conceptual)
 }
 
 fn dispatch_macro_name(conceptual: &Ident) -> Ident {
-    let dispatch = format!("proc_macro_call_{}", conceptual);
-    Ident::new(&dispatch, Span::call_site())
+    format_ident!("proc_macro_call_{}", conceptual)
 }
 
 fn call_site_macro_name(conceptual: &Ident) -> Ident {
-    let dispatch = format!("proc_macro_fake_call_site_{}", conceptual);
-    Ident::new(&dispatch, Span::call_site())
+    format_ident!("proc_macro_fake_call_site_{}", conceptual)
 }
 
 fn dummy_name_for_export(export: &Export) -> String {
