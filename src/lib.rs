@@ -127,14 +127,10 @@
 #![cfg_attr(feature = "cargo-clippy", allow(needless_pass_by_value))]
 
 extern crate proc_macro;
-extern crate proc_macro2;
-extern crate quote;
-extern crate syn;
-
-use std::fmt::Write;
 
 use proc_macro2::{Span, TokenStream, TokenTree};
 use quote::{format_ident, quote, ToTokens};
+use std::fmt::Write;
 use syn::parse::{Parse, ParseStream, Result};
 use syn::{braced, bracketed, parenthesized, parse_macro_input, token, Ident, LitInt, Token};
 
