@@ -205,7 +205,12 @@ impl Parse for Export {
         }
 
         input.parse::<Token![;]>()?;
-        Ok(Export { attrs, vis, from, macros })
+        Ok(Export {
+            attrs,
+            vis,
+            from,
+            macros,
+        })
     }
 }
 
