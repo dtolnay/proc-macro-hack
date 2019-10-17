@@ -131,6 +131,7 @@ extern crate proc_macro;
 use proc_macro2::{Span, TokenStream, TokenTree};
 use quote::{format_ident, quote, ToTokens};
 use std::fmt::Write;
+use syn::ext::IdentExt;
 use syn::parse::{Parse, ParseStream, Result};
 use syn::{braced, bracketed, parenthesized, parse_macro_input, token, Ident, LitInt, Token};
 
@@ -634,22 +635,12 @@ fn call_site_macro_name(conceptual: &Ident) -> Ident {
     format_ident!("proc_macro_fake_call_site_{}", conceptual)
 }
 
-fn escape_raw_identifier(ident: &str) -> &str {
-    if ident.starts_with("r#") {
-        &ident[2..]
-    } else {
-        ident
-    }
-}
-
 fn dummy_name_for_export(export: &Export) -> String {
     let mut dummy = String::new();
-    let from = export.from.to_string();
-    let from = escape_raw_identifier(&from);
+    let from = export.from.unraw().to_string();
     write!(dummy, "_{}{}", from.len(), from).unwrap();
     for m in &export.macros {
-        let name = m.name.to_string();
-        let name = escape_raw_identifier(&name);
+        let name = m.name.unraw().to_string();
         write!(dummy, "_{}{}", name.len(), name).unwrap();
     }
     dummy
