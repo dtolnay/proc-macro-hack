@@ -634,11 +634,23 @@ fn call_site_macro_name(conceptual: &Ident) -> Ident {
     format_ident!("proc_macro_fake_call_site_{}", conceptual)
 }
 
+fn escape_raw_identifier(ident: &str) -> &str {
+    if ident.starts_with("r#") {
+        &ident[2..]
+    } else {
+        ident
+    }
+}
+
 fn dummy_name_for_export(export: &Export) -> String {
     let mut dummy = String::new();
-    write!(dummy, "_{}{}", export.from.to_string().len(), export.from).unwrap();
+    let from = export.from.to_string();
+    let from = escape_raw_identifier(&from);
+    write!(dummy, "_{}{}", from.len(), from).unwrap();
     for m in &export.macros {
-        write!(dummy, "_{}{}", m.name.to_string().len(), m.name).unwrap();
+        let name = m.name.to_string();
+        let name = escape_raw_identifier(&name);
+        write!(dummy, "_{}{}", name.len(), name).unwrap();
     }
     dummy
 }
