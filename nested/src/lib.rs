@@ -16,7 +16,7 @@
 //! # const IGNORE: &str = stringify! {
 //! #[proc_macro_hack]
 //! pub use demo_hack_impl::add_one;
-//! # }
+//! # };
 //! ```
 //!
 //! ```
@@ -24,7 +24,7 @@
 //! # const IGNORE: &str = stringify! {
 //! #[proc_macro_hack(support_nested)]
 //! pub use demo_hack_impl::add_one;
-//! # }
+//! # };
 //! ```
 //!
 //! No change is required within your definition crate, only to the re-export in
