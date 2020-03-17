@@ -26,3 +26,6 @@ travis-ci = { repository = "dtolnay/proc-macro-hack" }
 
 [workspace]
 members = ["demo-hack", "demo-hack-impl", "example", "nested"]
+
+[package.metadata.docs.rs]
+targets = ["x86_64-unknown-linux-gnu"]

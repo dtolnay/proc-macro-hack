@@ -10,3 +10,6 @@ edition = "2018"
 [dependencies]
 proc-macro-hack = { version = "0.5", path = ".." }
 demo-hack-impl = { version = "0.0.5", path = "../demo-hack-impl" }
+
+[package.metadata.docs.rs]
+targets = ["x86_64-unknown-linux-gnu"]
