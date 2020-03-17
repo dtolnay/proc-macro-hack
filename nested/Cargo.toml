@@ -1,6 +1,6 @@
 [package]
 name = "proc-macro-nested"
-version = "0.1.3"
+version = "0.1.4"
 authors = ["David Tolnay <dtolnay@gmail.com>"]
 license = "MIT OR Apache-2.0"
 description = "Support for nested proc-macro-hack invocations"
