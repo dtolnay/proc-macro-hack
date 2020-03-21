@@ -128,13 +128,15 @@
 
 extern crate proc_macro;
 
+#[macro_use]
+mod quote;
+
 mod error;
 mod parse;
 
 use crate::error::{compile_error, Error};
 use crate::parse::*;
-use proc_macro2::{token_stream, Ident, Span, TokenStream};
-use quote::{format_ident, quote, ToTokens};
+use proc_macro2::{token_stream, Ident, Punct, Spacing, Span, TokenStream, TokenTree};
 use std::fmt::Write;
 use std::iter::Peekable;
 
@@ -250,12 +252,13 @@ fn expand_export(export: Export, args: ExportArgs) -> TokenStream {
     let crate_prefix = vis.as_ref().map(|_| quote!($crate::));
     let enum_variant = if args.support_nested {
         if args.internal_macro_calls == 0 {
-            quote!(Nested)
+            Ident::new("Nested", Span::call_site())
         } else {
-            format_ident!("Nested{}", args.internal_macro_calls).to_token_stream()
+            let name = format!("Nested{}", args.internal_macro_calls);
+            Ident::new(&name, Span::call_site())
         }
     } else {
-        quote!(Value)
+        Ident::new("Value", Span::call_site())
     };
 
     let from = export.from;
@@ -277,9 +280,11 @@ fn expand_export(export: Export, args: ExportArgs) -> TokenStream {
             };
 
             let proc_macro_call = if args.support_nested {
-                let extra_bangs = (0..args.internal_macro_calls).map(|_| quote!(!));
+                let extra_bangs = (0..args.internal_macro_calls)
+                    .map(|_| TokenTree::Punct(Punct::new('!', Spacing::Alone)))
+                    .collect::<TokenStream>();
                 quote! {
-                    #crate_prefix #dispatch! { ($($proc_macro)*) #(#extra_bangs)* }
+                    #crate_prefix #dispatch! { ($($proc_macro)*) #extra_bangs }
                 }
             } else {
                 quote! {
@@ -449,15 +454,24 @@ fn expand_define(define: Define) -> TokenStream {
 }
 
 fn actual_proc_macro_name(conceptual: &Ident) -> Ident {
-    format_ident!("proc_macro_hack_{}", conceptual)
+    Ident::new(
+        &format!("proc_macro_hack_{}", conceptual),
+        conceptual.span(),
+    )
 }
 
 fn dispatch_macro_name(conceptual: &Ident) -> Ident {
-    format_ident!("proc_macro_call_{}", conceptual)
+    Ident::new(
+        &format!("proc_macro_call_{}", conceptual),
+        conceptual.span(),
+    )
 }
 
 fn call_site_macro_name(conceptual: &Ident) -> Ident {
-    format_ident!("proc_macro_fake_call_site_{}", conceptual)
+    Ident::new(
+        &format!("proc_macro_fake_call_site_{}", conceptual),
+        conceptual.span(),
+    )
 }
 
 fn dummy_name_for_export(export: &Export) -> String {
