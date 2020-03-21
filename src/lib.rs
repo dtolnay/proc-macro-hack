@@ -123,8 +123,7 @@
 //! [`proc-macro-nested`]: https://docs.rs/proc-macro-nested
 
 #![recursion_limit = "512"]
-#![cfg_attr(feature = "cargo-clippy", allow(renamed_and_removed_lints))]
-#![cfg_attr(feature = "cargo-clippy", allow(needless_pass_by_value))]
+#![allow(clippy::needless_doctest_main, clippy::toplevel_ref_arg)]
 
 extern crate proc_macro;
 
