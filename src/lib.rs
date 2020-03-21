@@ -173,7 +173,7 @@ impl Parse for Input {
         } else if ahead.peek(Token![fn]) {
             input.parse().map(Input::Define)
         } else {
-            Err(input.error("unexpected input to #[proc_macro_hack]"))
+            Err(ahead.error("unexpected input to #[proc_macro_hack]"))
         }
     }
 }
