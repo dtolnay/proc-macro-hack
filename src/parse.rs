@@ -40,6 +40,7 @@ fn parse_export(attrs: TokenStream, vis: Visibility, tokens: Iter) -> Result<Exp
                     break;
                 }
             }
+            tokens.next().unwrap();
         }
         _ => macros.push(parse_macro(tokens)?),
     }
