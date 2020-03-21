@@ -18,6 +18,8 @@ matrix:
       name: Minimal versions
       before_script:
         - cargo update -Z minimal-versions --manifest-path example/Cargo.toml
+      script:
+        - cargo check --manifest-path example/Cargo.toml
     - rust: 1.31.0
       name: 2015 edition
       script:
