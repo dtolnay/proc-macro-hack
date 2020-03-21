@@ -20,6 +20,8 @@ syn = "1.0.5"
 [dev-dependencies]
 demo-hack = { version = "0.0.5", path = "demo-hack" }
 demo-hack-impl = { version = "0.0.5", path = "demo-hack-impl" }
+rustversion = "1.0"
+trybuild = "1.0"
 
 [badges]
 travis-ci = { repository = "dtolnay/proc-macro-hack" }
