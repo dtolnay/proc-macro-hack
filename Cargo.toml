@@ -12,9 +12,6 @@ readme = "README.md"
 [lib]
 proc-macro = true
 
-[dependencies]
-proc-macro2 = "1.0"
-
 [dev-dependencies]
 demo-hack = { version = "0.0.5", path = "demo-hack" }
 demo-hack-impl = { version = "0.0.5", path = "demo-hack-impl" }

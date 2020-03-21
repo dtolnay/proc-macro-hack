@@ -1,15 +1,15 @@
 use crate::{Define, Error, Export, ExportArgs, FakeCallSite, Input, Iter, Macro, Visibility};
-use proc_macro2::Delimiter::{Brace, Bracket, Parenthesis};
-use proc_macro2::{token_stream, Delimiter, Ident, Span, TokenStream, TokenTree};
+use proc_macro::Delimiter::{Brace, Bracket, Parenthesis};
+use proc_macro::{token_stream, Delimiter, Ident, Span, TokenStream, TokenTree};
 use std::iter::Peekable;
 
 pub(crate) fn parse_input(tokens: Iter) -> Result<Input, Error> {
     let attrs = parse_attributes(tokens)?;
     let vis = parse_visibility(tokens)?;
     let kw = parse_ident(tokens)?;
-    if kw == "use" {
+    if kw.to_string() == "use" {
         parse_export(attrs, vis, tokens).map(Input::Export)
-    } else if kw == "fn" {
+    } else if kw.to_string() == "fn" {
         parse_define(attrs, vis, kw.span(), tokens).map(Input::Define)
     } else {
         Err(Error::new(
@@ -86,7 +86,7 @@ fn parse_define(
 fn parse_macro(tokens: Iter) -> Result<Macro, Error> {
     let name = parse_ident(tokens)?;
     let export_as = match tokens.peek() {
-        Some(TokenTree::Ident(ident)) if ident == "as" => {
+        Some(TokenTree::Ident(ident)) if ident.to_string() == "as" => {
             tokens.next().unwrap();
             parse_ident(tokens)?
         }
@@ -107,7 +107,7 @@ fn parse_ident(tokens: Iter) -> Result<Ident, Error> {
 
 fn parse_keyword(tokens: Iter, kw: &'static str) -> Result<(), Error> {
     match &tokens.next() {
-        Some(TokenTree::Ident(ident)) if ident == kw => Ok(()),
+        Some(TokenTree::Ident(ident)) if ident.to_string() == kw => Ok(()),
         tt => Err(Error::new(
             tt.as_ref().map_or_else(Span::call_site, TokenTree::span),
             format!("expected `{}`", kw),
@@ -140,7 +140,7 @@ fn parse_group(
 
 fn parse_visibility(tokens: Iter) -> Result<Visibility, Error> {
     if let Some(TokenTree::Ident(ident)) = tokens.peek() {
-        if ident == "pub" {
+        if ident.to_string() == "pub" {
             return Ok(Some(tokens.next().unwrap().span()));
         }
     }
@@ -174,17 +174,17 @@ pub(crate) fn parse_export_args(tokens: Iter) -> Result<ExportArgs, Error> {
 
     while let Some(tt) = tokens.next() {
         match &tt {
-            TokenTree::Ident(ident) if ident == "support_nested" => {
+            TokenTree::Ident(ident) if ident.to_string() == "support_nested" => {
                 args.support_nested = true;
             }
-            TokenTree::Ident(ident) if ident == "internal_macro_calls" => {
+            TokenTree::Ident(ident) if ident.to_string() == "internal_macro_calls" => {
                 parse_punct(tokens, '=')?;
                 let calls = parse_int(tokens).map_err(|span| {
                     Error::new(span, "expected integer value for internal_macro_calls")
                 })?;
                 args.internal_macro_calls = calls;
             }
-            TokenTree::Ident(ident) if ident == "fake_call_site" => {
+            TokenTree::Ident(ident) if ident.to_string() == "fake_call_site" => {
                 args.fake_call_site = true;
             }
             _ => {

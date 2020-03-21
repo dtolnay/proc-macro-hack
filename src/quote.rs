@@ -1,12 +1,12 @@
-use proc_macro2::{Ident, TokenStream, TokenTree};
+use proc_macro::{Ident, TokenStream, TokenTree};
 use std::iter;
 
 macro_rules! quote {
     () => {
-        ::proc_macro2::TokenStream::new()
+        ::proc_macro::TokenStream::new()
     };
     ($($tt:tt)*) => {{
-        let mut tokens = ::proc_macro2::TokenStream::new();
+        let mut tokens = ::proc_macro::TokenStream::new();
         quote_each_token!(tokens $($tt)*);
         tokens
     }};
@@ -18,13 +18,13 @@ macro_rules! quote_each_token {
         quote_each_token!($tokens $($rest)*);
     };
     ($tokens:ident $ident:ident $($rest:tt)*) => {
-        <::proc_macro2::TokenStream as ::std::iter::Extend<_>>::extend(
+        <::proc_macro::TokenStream as ::std::iter::Extend<_>>::extend(
             &mut $tokens,
             ::std::iter::once(
-                ::proc_macro2::TokenTree::Ident(
-                    ::proc_macro2::Ident::new(
+                ::proc_macro::TokenTree::Ident(
+                    ::proc_macro::Ident::new(
                         stringify!($ident),
-                        ::proc_macro2::Span::call_site(),
+                        ::proc_macro::Span::call_site(),
                     ),
                 ),
             ),
@@ -32,12 +32,12 @@ macro_rules! quote_each_token {
         quote_each_token!($tokens $($rest)*);
     };
     ($tokens:ident ( $($inner:tt)* ) $($rest:tt)*) => {
-        <::proc_macro2::TokenStream as ::std::iter::Extend<_>>::extend(
+        <::proc_macro::TokenStream as ::std::iter::Extend<_>>::extend(
             &mut $tokens,
             ::std::iter::once(
-                ::proc_macro2::TokenTree::Group(
-                    ::proc_macro2::Group::new(
-                        ::proc_macro2::Delimiter::Parenthesis,
+                ::proc_macro::TokenTree::Group(
+                    ::proc_macro::Group::new(
+                        ::proc_macro::Delimiter::Parenthesis,
                         quote!($($inner)*),
                     ),
                 ),
@@ -46,12 +46,12 @@ macro_rules! quote_each_token {
         quote_each_token!($tokens $($rest)*);
     };
     ($tokens:ident [ $($inner:tt)* ] $($rest:tt)*) => {
-        <::proc_macro2::TokenStream as ::std::iter::Extend<_>>::extend(
+        <::proc_macro::TokenStream as ::std::iter::Extend<_>>::extend(
             &mut $tokens,
             ::std::iter::once(
-                ::proc_macro2::TokenTree::Group(
-                    ::proc_macro2::Group::new(
-                        ::proc_macro2::Delimiter::Bracket,
+                ::proc_macro::TokenTree::Group(
+                    ::proc_macro::Group::new(
+                        ::proc_macro::Delimiter::Bracket,
                         quote!($($inner)*),
                     ),
                 ),
@@ -60,12 +60,12 @@ macro_rules! quote_each_token {
         quote_each_token!($tokens $($rest)*);
     };
     ($tokens:ident { $($inner:tt)* } $($rest:tt)*) => {
-        <::proc_macro2::TokenStream as ::std::iter::Extend<_>>::extend(
+        <::proc_macro::TokenStream as ::std::iter::Extend<_>>::extend(
             &mut $tokens,
             ::std::iter::once(
-                ::proc_macro2::TokenTree::Group(
-                    ::proc_macro2::Group::new(
-                        ::proc_macro2::Delimiter::Brace,
+                ::proc_macro::TokenTree::Group(
+                    ::proc_macro::Group::new(
+                        ::proc_macro::Delimiter::Brace,
                         quote!($($inner)*),
                     ),
                 ),
@@ -74,9 +74,9 @@ macro_rules! quote_each_token {
         quote_each_token!($tokens $($rest)*);
     };
     ($tokens:ident $punct:tt $($rest:tt)*) => {
-        <::proc_macro2::TokenStream as ::std::iter::Extend<_>>::extend(
+        <::proc_macro::TokenStream as ::std::iter::Extend<_>>::extend(
             &mut $tokens,
-            stringify!($punct).parse::<::proc_macro2::TokenStream>(),
+            stringify!($punct).parse::<::proc_macro::TokenStream>(),
         );
         quote_each_token!($tokens $($rest)*);
     };

@@ -136,7 +136,7 @@ mod parse;
 
 use crate::error::{compile_error, Error};
 use crate::parse::*;
-use proc_macro2::{token_stream, Ident, Punct, Spacing, Span, TokenStream, TokenTree};
+use proc_macro::{token_stream, Ident, Punct, Spacing, Span, TokenStream, TokenTree};
 use std::fmt::Write;
 use std::iter::Peekable;
 
@@ -169,14 +169,10 @@ struct Macro {
 }
 
 #[proc_macro_attribute]
-pub fn proc_macro_hack(
-    args: proc_macro::TokenStream,
-    input: proc_macro::TokenStream,
-) -> proc_macro::TokenStream {
-    let ref mut args = TokenStream::from(args).into_iter().peekable();
-    let ref mut input = TokenStream::from(input).into_iter().peekable();
-    let output = expand_proc_macro_hack(args, input).unwrap_or_else(compile_error);
-    proc_macro::TokenStream::from(output)
+pub fn proc_macro_hack(args: TokenStream, input: TokenStream) -> TokenStream {
+    let ref mut args = args.into_iter().peekable();
+    let ref mut input = input.into_iter().peekable();
+    expand_proc_macro_hack(args, input).unwrap_or_else(compile_error)
 }
 
 fn expand_proc_macro_hack(args: Iter, input: Iter) -> Result<TokenStream, Error> {
@@ -194,10 +190,9 @@ fn expand_proc_macro_hack(args: Iter, input: Iter) -> Result<TokenStream, Error>
 
 #[doc(hidden)]
 #[proc_macro_derive(ProcMacroHack)]
-pub fn enum_hack(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    let ref mut input = TokenStream::from(input).into_iter().peekable();
-    let output = parse_enum_hack(input).unwrap_or_else(compile_error);
-    proc_macro::TokenStream::from(output)
+pub fn enum_hack(input: TokenStream) -> TokenStream {
+    let ref mut input = input.into_iter().peekable();
+    parse_enum_hack(input).unwrap_or_else(compile_error)
 }
 
 struct FakeCallSite {
@@ -207,14 +202,10 @@ struct FakeCallSite {
 
 #[doc(hidden)]
 #[proc_macro_attribute]
-pub fn fake_call_site(
-    args: proc_macro::TokenStream,
-    input: proc_macro::TokenStream,
-) -> proc_macro::TokenStream {
-    let ref mut args = TokenStream::from(args).into_iter().peekable();
-    let ref mut input = TokenStream::from(input).into_iter().peekable();
-    let output = expand_fake_call_site(args, input).unwrap_or_else(compile_error);
-    proc_macro::TokenStream::from(output)
+pub fn fake_call_site(args: TokenStream, input: TokenStream) -> TokenStream {
+    let ref mut args = args.into_iter().peekable();
+    let ref mut input = input.into_iter().peekable();
+    expand_fake_call_site(args, input).unwrap_or_else(compile_error)
 }
 
 fn expand_fake_call_site(args: Iter, input: Iter) -> Result<TokenStream, Error> {
