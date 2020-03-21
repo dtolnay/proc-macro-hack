@@ -128,14 +128,14 @@
 
 extern crate proc_macro;
 
-use proc_macro2::{Span, TokenStream, TokenTree};
-use quote::{format_ident, quote, ToTokens};
+use proc_macro2::Delimiter::{Brace, Bracket, Parenthesis};
+use proc_macro2::{token_stream, Delimiter, Ident, Span, TokenStream, TokenTree};
+use quote::{format_ident, quote, quote_spanned, ToTokens};
 use std::fmt::Write;
-use syn::ext::IdentExt;
-use syn::parse::{Parse, ParseStream, Result};
-use syn::{braced, bracketed, parenthesized, parse_macro_input, token, Ident, LitInt, Token};
+use std::iter::Peekable;
 
-type Visibility = Option<Token![pub]>;
+type Iter<'a> = &'a mut Peekable<token_stream::IntoIter>;
+type Visibility = Option<Span>;
 
 enum Input {
     Export(Export),
@@ -162,96 +162,178 @@ struct Macro {
     export_as: Ident,
 }
 
-impl Parse for Input {
-    fn parse(input: ParseStream) -> Result<Self> {
-        let ahead = input.fork();
-        parse_attributes(&ahead)?;
-        ahead.parse::<Visibility>()?;
+struct Error {
+    span: Span,
+    msg: String,
+}
 
-        if ahead.peek(Token![use]) {
-            input.parse().map(Input::Export)
-        } else if ahead.peek(Token![fn]) {
-            input.parse().map(Input::Define)
-        } else {
-            Err(ahead.error("unexpected input to #[proc_macro_hack]"))
+impl Error {
+    fn new(span: Span, msg: impl Into<String>) -> Self {
+        Error {
+            span,
+            msg: msg.into(),
         }
     }
 }
 
-impl Parse for Export {
-    fn parse(input: ParseStream) -> Result<Self> {
-        let attrs = input.call(parse_attributes)?;
-        let vis: Visibility = input.parse()?;
-        input.parse::<Token![use]>()?;
-        input.parse::<Option<Token![::]>>()?;
-        let from: Ident = input.parse()?;
-        input.parse::<Token![::]>()?;
+fn parse_input(tokens: Iter) -> Result<Input, Error> {
+    let attrs = parse_attributes(tokens)?;
+    let vis = parse_visibility(tokens)?;
+    let kw = parse_ident(tokens)?;
+    if kw == "use" {
+        parse_export(attrs, vis, tokens).map(Input::Export)
+    } else if kw == "fn" {
+        parse_define(attrs, vis, kw.span(), tokens).map(Input::Define)
+    } else {
+        Err(Error::new(
+            kw.span(),
+            "unexpected input to #[proc_macro_hack]",
+        ))
+    }
+}
 
-        let mut macros = Vec::new();
-        if input.peek(token::Brace) {
-            let content;
-            braced!(content in input);
+fn parse_export(attrs: TokenStream, vis: Visibility, tokens: Iter) -> Result<Export, Error> {
+    let _ = parse_punct(tokens, ':');
+    let _ = parse_punct(tokens, ':');
+    let from = parse_ident(tokens)?;
+    parse_punct(tokens, ':')?;
+    parse_punct(tokens, ':')?;
+
+    let mut macros = Vec::new();
+    match tokens.peek() {
+        Some(TokenTree::Group(group)) if group.delimiter() == Brace => {
+            let ref mut content = group.stream().into_iter().peekable();
             loop {
-                macros.push(content.parse()?);
-                if content.is_empty() {
+                macros.push(parse_macro(content)?);
+                if content.peek().is_none() {
                     break;
                 }
-                content.parse::<Token![,]>()?;
-                if content.is_empty() {
+                parse_punct(content, ',')?;
+                if content.peek().is_none() {
                     break;
                 }
             }
-        } else {
-            macros.push(input.parse()?);
         }
-
-        input.parse::<Token![;]>()?;
-        Ok(Export {
-            attrs,
-            vis,
-            from,
-            macros,
-        })
+        _ => macros.push(parse_macro(tokens)?),
     }
+
+    parse_punct(tokens, ';')?;
+    Ok(Export {
+        attrs,
+        vis,
+        from,
+        macros,
+    })
 }
 
-impl Parse for Define {
-    fn parse(input: ParseStream) -> Result<Self> {
-        let attrs = input.call(parse_attributes)?;
-        let vis: Visibility = input.parse()?;
-        if vis.is_none() {
-            return Err(input.error("functions tagged with `#[proc_macro_hack]` must be `pub`"));
+fn parse_punct(tokens: Iter, ch: char) -> Result<(), Error> {
+    match tokens.peek() {
+        Some(TokenTree::Punct(punct)) if punct.as_char() == ch => {
+            tokens.next().unwrap();
+            Ok(())
         }
-
-        input.parse::<Token![fn]>()?;
-        let name: Ident = input.parse()?;
-        let body: TokenStream = input.parse()?;
-        Ok(Define { attrs, name, body })
+        tt => Err(Error::new(
+            tt.map_or_else(Span::call_site, TokenTree::span),
+            format!("expected `{}`", ch),
+        )),
     }
 }
 
-impl Parse for Macro {
-    fn parse(input: ParseStream) -> Result<Self> {
-        let name: Ident = input.parse()?;
-        let renamed: Option<Token![as]> = input.parse()?;
-        let export_as = if renamed.is_some() {
-            input.parse()?
-        } else {
-            name.clone()
-        };
-        Ok(Macro { name, export_as })
+fn parse_define(
+    attrs: TokenStream,
+    vis: Visibility,
+    fn_token: Span,
+    tokens: Iter,
+) -> Result<Define, Error> {
+    if vis.is_none() {
+        return Err(Error::new(
+            fn_token,
+            "functions tagged with `#[proc_macro_hack]` must be `pub`",
+        ));
+    }
+    let name = parse_ident(tokens)?;
+    let body = tokens.collect();
+    Ok(Define { attrs, name, body })
+}
+
+fn parse_macro(tokens: Iter) -> Result<Macro, Error> {
+    let name = parse_ident(tokens)?;
+    let export_as = match tokens.peek() {
+        Some(TokenTree::Ident(ident)) if ident == "as" => {
+            tokens.next().unwrap();
+            parse_ident(tokens)?
+        }
+        _ => name.clone(),
+    };
+    Ok(Macro { name, export_as })
+}
+
+fn parse_ident(tokens: Iter) -> Result<Ident, Error> {
+    match tokens.next() {
+        Some(TokenTree::Ident(ident)) => Ok(ident),
+        tt => Err(Error::new(
+            tt.as_ref().map_or_else(Span::call_site, TokenTree::span),
+            "expected identifier",
+        )),
     }
 }
 
-fn parse_attributes(input: ParseStream) -> Result<TokenStream> {
+fn parse_keyword(tokens: Iter, kw: &'static str) -> Result<(), Error> {
+    match &tokens.next() {
+        Some(TokenTree::Ident(ident)) if ident == kw => Ok(()),
+        tt => Err(Error::new(
+            tt.as_ref().map_or_else(Span::call_site, TokenTree::span),
+            format!("expected `{}`", kw),
+        )),
+    }
+}
+
+fn parse_int(tokens: Iter) -> Result<u16, Span> {
+    match tokens.next() {
+        Some(TokenTree::Literal(lit)) => lit.to_string().parse().map_err(|_| lit.span()),
+        Some(tt) => Err(tt.span()),
+        None => Err(Span::call_site()),
+    }
+}
+
+fn parse_group(
+    tokens: Iter,
+    delimiter: Delimiter,
+) -> Result<Peekable<token_stream::IntoIter>, Error> {
+    match &tokens.next() {
+        Some(TokenTree::Group(group)) if group.delimiter() == delimiter => {
+            Ok(group.stream().into_iter().peekable())
+        }
+        tt => Err(Error::new(
+            tt.as_ref().map_or_else(Span::call_site, TokenTree::span),
+            "expected delimiter",
+        )),
+    }
+}
+
+fn parse_visibility(tokens: Iter) -> Result<Visibility, Error> {
+    if let Some(TokenTree::Ident(ident)) = tokens.peek() {
+        if ident == "pub" {
+            return Ok(Some(tokens.next().unwrap().span()));
+        }
+    }
+    Ok(None)
+}
+
+fn parse_attributes(tokens: Iter) -> Result<TokenStream, Error> {
     let mut attrs = TokenStream::new();
-    while input.peek(Token![#]) {
-        let pound: Token![#] = input.parse()?;
-        pound.to_tokens(&mut attrs);
-        let content;
-        let bracket_token = bracketed!(content in input);
-        let content: TokenStream = content.parse()?;
-        bracket_token.surround(&mut attrs, |tokens| content.to_tokens(tokens));
+    while let Some(TokenTree::Punct(punct)) = tokens.peek() {
+        if punct.as_char() != '#' {
+            break;
+        }
+        let span = punct.span();
+        attrs.extend(tokens.next());
+        match tokens.peek() {
+            Some(TokenTree::Group(group)) if group.delimiter() == Bracket => {
+                attrs.extend(tokens.next());
+            }
+            _ => return Err(Error::new(span, "unexpected input")),
+        }
     }
     Ok(attrs)
 }
@@ -261,23 +343,29 @@ pub fn proc_macro_hack(
     args: proc_macro::TokenStream,
     input: proc_macro::TokenStream,
 ) -> proc_macro::TokenStream {
-    proc_macro::TokenStream::from(match parse_macro_input!(input) {
-        Input::Export(export) => {
-            let args = parse_macro_input!(args as ExportArgs);
-            expand_export(export, args)
-        }
-        Input::Define(define) => {
-            parse_macro_input!(args as DefineArgs);
-            expand_define(define)
-        }
-    })
+    let ref mut args = TokenStream::from(args).into_iter().peekable();
+    let ref mut input = TokenStream::from(input).into_iter().peekable();
+    let output = expand_proc_macro_hack(args, input).unwrap_or_else(compile_error);
+    proc_macro::TokenStream::from(output)
 }
 
-mod kw {
-    syn::custom_keyword!(derive);
-    syn::custom_keyword!(fake_call_site);
-    syn::custom_keyword!(internal_macro_calls);
-    syn::custom_keyword!(support_nested);
+fn expand_proc_macro_hack(args: Iter, input: Iter) -> Result<TokenStream, Error> {
+    match parse_input(input)? {
+        Input::Export(export) => {
+            let args = parse_export_args(args)?;
+            Ok(expand_export(export, args))
+        }
+        Input::Define(define) => {
+            parse_define_args(args)?;
+            Ok(expand_define(define))
+        }
+    }
+}
+
+fn compile_error(err: Error) -> TokenStream {
+    let span = err.span;
+    let msg = err.msg;
+    quote_spanned!(span=> compile_error! { #msg })
 }
 
 struct ExportArgs {
@@ -286,86 +374,82 @@ struct ExportArgs {
     fake_call_site: bool,
 }
 
-impl Parse for ExportArgs {
-    fn parse(input: ParseStream) -> Result<Self> {
-        let mut args = ExportArgs {
-            support_nested: false,
-            internal_macro_calls: 0,
-            fake_call_site: false,
-        };
+fn parse_export_args(tokens: Iter) -> Result<ExportArgs, Error> {
+    let mut args = ExportArgs {
+        support_nested: false,
+        internal_macro_calls: 0,
+        fake_call_site: false,
+    };
 
-        while !input.is_empty() {
-            let ahead = input.lookahead1();
-            if ahead.peek(kw::support_nested) {
-                input.parse::<kw::support_nested>()?;
+    while let Some(tt) = tokens.next() {
+        match &tt {
+            TokenTree::Ident(ident) if ident == "support_nested" => {
                 args.support_nested = true;
-            } else if ahead.peek(kw::internal_macro_calls) {
-                input.parse::<kw::internal_macro_calls>()?;
-                input.parse::<Token![=]>()?;
-                let calls = input.parse::<LitInt>()?.base10_parse()?;
+            }
+            TokenTree::Ident(ident) if ident == "internal_macro_calls" => {
+                parse_punct(tokens, '=')?;
+                let calls = parse_int(tokens).map_err(|span| {
+                    Error::new(span, "expected integer value for internal_macro_calls")
+                })?;
                 args.internal_macro_calls = calls;
-            } else if ahead.peek(kw::fake_call_site) {
-                input.parse::<kw::fake_call_site>()?;
+            }
+            TokenTree::Ident(ident) if ident == "fake_call_site" => {
                 args.fake_call_site = true;
-            } else {
-                return Err(ahead.error());
             }
-            if input.is_empty() {
-                break;
+            _ => {
+                return Err(Error::new(
+                    tt.span(),
+                    "expected one of: `support_nested`, `internal_macro_calls`, `fake_call_site`",
+                ))
             }
-            input.parse::<Token![,]>()?;
         }
+        if tokens.peek().is_none() {
+            break;
+        }
+        parse_punct(tokens, ',')?;
+    }
 
-        Ok(args)
+    Ok(args)
+}
+
+fn parse_define_args(tokens: Iter) -> Result<(), Error> {
+    if tokens.peek().is_none() {
+        Ok(())
+    } else {
+        Err(Error::new(Span::call_site(), "unexpected input"))
     }
 }
 
-struct DefineArgs;
+fn parse_enum_hack(tokens: Iter) -> Result<TokenStream, Error> {
+    parse_keyword(tokens, "enum")?;
+    parse_ident(tokens)?;
 
-impl Parse for DefineArgs {
-    fn parse(_input: ParseStream) -> Result<Self> {
-        Ok(DefineArgs)
-    }
-}
+    let ref mut braces = parse_group(tokens, Brace)?;
+    parse_ident(braces)?;
+    parse_punct(braces, '=')?;
 
-struct EnumHack {
-    token_stream: TokenStream,
-}
+    let ref mut parens = parse_group(braces, Parenthesis)?;
+    parse_ident(parens)?;
+    parse_punct(parens, '!')?;
 
-impl Parse for EnumHack {
-    fn parse(input: ParseStream) -> Result<Self> {
-        input.parse::<Token![enum]>()?;
-        input.parse::<Ident>()?;
+    let ref mut inner = parse_group(parens, Brace)?;
+    let token_stream = inner.collect();
 
-        let braces;
-        braced!(braces in input);
-        braces.parse::<Ident>()?;
-        braces.parse::<Token![=]>()?;
+    parse_punct(parens, ',')?;
+    let _ = parens.next();
+    parse_punct(braces, '.')?;
+    let _ = braces.next();
+    parse_punct(braces, ',')?;
 
-        let parens;
-        parenthesized!(parens in braces);
-        parens.parse::<Ident>()?;
-        parens.parse::<Token![!]>()?;
-
-        let inner;
-        braced!(inner in parens);
-        let token_stream: TokenStream = inner.parse()?;
-
-        parens.parse::<Token![,]>()?;
-        parens.parse::<TokenTree>()?;
-        braces.parse::<Token![.]>()?;
-        braces.parse::<TokenTree>()?;
-        braces.parse::<Token![,]>()?;
-
-        Ok(EnumHack { token_stream })
-    }
+    Ok(token_stream)
 }
 
 #[doc(hidden)]
 #[proc_macro_derive(ProcMacroHack)]
 pub fn enum_hack(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    let inner = parse_macro_input!(input as EnumHack);
-    proc_macro::TokenStream::from(inner.token_stream)
+    let ref mut input = TokenStream::from(input).into_iter().peekable();
+    let output = parse_enum_hack(input).unwrap_or_else(compile_error);
+    proc_macro::TokenStream::from(output)
 }
 
 struct FakeCallSite {
@@ -373,19 +457,15 @@ struct FakeCallSite {
     rest: TokenStream,
 }
 
-impl Parse for FakeCallSite {
-    fn parse(input: ParseStream) -> Result<Self> {
-        input.parse::<Token![#]>()?;
-        let attr;
-        bracketed!(attr in input);
-        attr.parse::<kw::derive>()?;
-        let path;
-        parenthesized!(path in attr);
-        Ok(FakeCallSite {
-            derive: path.parse()?,
-            rest: input.parse()?,
-        })
-    }
+fn parse_fake_call_site(tokens: Iter) -> Result<FakeCallSite, Error> {
+    parse_punct(tokens, '#')?;
+    let ref mut attr = parse_group(tokens, Bracket)?;
+    parse_keyword(attr, "derive")?;
+    let ref mut path = parse_group(attr, Parenthesis)?;
+    Ok(FakeCallSite {
+        derive: parse_ident(path)?,
+        rest: tokens.collect(),
+    })
 }
 
 #[doc(hidden)]
@@ -394,35 +474,39 @@ pub fn fake_call_site(
     args: proc_macro::TokenStream,
     input: proc_macro::TokenStream,
 ) -> proc_macro::TokenStream {
-    let args = TokenStream::from(args);
-    let span = match args.into_iter().next() {
+    let ref mut args = TokenStream::from(args).into_iter().peekable();
+    let ref mut input = TokenStream::from(input).into_iter().peekable();
+    let output = expand_fake_call_site(args, input).unwrap_or_else(compile_error);
+    proc_macro::TokenStream::from(output)
+}
+
+fn expand_fake_call_site(args: Iter, input: Iter) -> Result<TokenStream, Error> {
+    let span = match args.next() {
         Some(token) => token.span(),
-        None => return input,
+        None => return Ok(input.collect()),
     };
 
-    let input = parse_macro_input!(input as FakeCallSite);
+    let input = parse_fake_call_site(input)?;
     let mut derive = input.derive;
     derive.set_span(span);
     let rest = input.rest;
 
-    let expanded = quote! {
+    Ok(quote! {
         #[derive(#derive)]
         #rest
-    };
-
-    proc_macro::TokenStream::from(expanded)
+    })
 }
 
 fn expand_export(export: Export, args: ExportArgs) -> TokenStream {
     let dummy = dummy_name_for_export(&export);
 
     let attrs = export.attrs;
-    let vis = export.vis;
+    let ref vis = export.vis.map(|span| Ident::new("pub", span));
     let macro_export = match vis {
         Some(_) => quote!(#[macro_export]),
         None => quote!(),
     };
-    let crate_prefix = vis.map(|_| quote!($crate::));
+    let crate_prefix = vis.as_ref().map(|_| quote!($crate::));
     let enum_variant = if args.support_nested {
         if args.internal_macro_calls == 0 {
             quote!(Nested)
@@ -637,13 +721,22 @@ fn call_site_macro_name(conceptual: &Ident) -> Ident {
 
 fn dummy_name_for_export(export: &Export) -> String {
     let mut dummy = String::new();
-    let from = export.from.unraw().to_string();
+    let from = unraw(&export.from).to_string();
     write!(dummy, "_{}{}", from.len(), from).unwrap();
     for m in &export.macros {
-        let name = m.name.unraw().to_string();
+        let name = unraw(&m.name).to_string();
         write!(dummy, "_{}{}", name.len(), name).unwrap();
     }
     dummy
+}
+
+fn unraw(ident: &Ident) -> Ident {
+    let string = ident.to_string();
+    if string.starts_with("r#") {
+        Ident::new(&string[2..], ident.span())
+    } else {
+        ident.clone()
+    }
 }
 
 fn wrap_in_enum_hack(dummy: String, inner: TokenStream) -> TokenStream {
