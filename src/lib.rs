@@ -320,6 +320,7 @@ fn expand_export(export: Export, args: ExportArgs) -> TokenStream {
                 macro_rules! #export_as {
                     ($($proc_macro:tt)*) => {{
                         #do_derive
+                        #[allow(dead_code)]
                         enum ProcMacroHack {
                             #enum_variant = (stringify! { $($proc_macro)* }, 0).1,
                         }
@@ -353,6 +354,8 @@ fn expand_define(define: Define) -> TokenStream {
             let mut iter = input.into_iter();
             iter.next().unwrap(); // `enum`
             iter.next().unwrap(); // `ProcMacroHack`
+            iter.next().unwrap(); // `#`
+            iter.next().unwrap(); // `[allow(dead_code)]`
 
             let mut braces = match iter.next().unwrap() {
                 #dummy::TokenTree::Group(group) => group.stream().into_iter(),
