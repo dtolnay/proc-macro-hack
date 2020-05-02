@@ -20,9 +20,6 @@ rustversion = "1.0"
 syn = "1.0.5"
 trybuild = "1.0"
 
-[badges]
-travis-ci = { repository = "dtolnay/proc-macro-hack" }
-
 [workspace]
 members = ["demo-hack", "demo-hack-impl", "example", "nested"]
 
