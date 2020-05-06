@@ -1,7 +1,7 @@
 Procedural macros in expression position
 ========================================
 
-[![Build Status](https://api.travis-ci.org/dtolnay/proc-macro-hack.svg?branch=master)](https://travis-ci.org/dtolnay/proc-macro-hack)
+[![Build Status](https://img.shields.io/github/workflow/status/dtolnay/proc-macro-hack/CI/master)](https://github.com/dtolnay/proc-macro-hack/actions?query=branch%3Amaster)
 [![Latest Version](https://img.shields.io/crates/v/proc-macro-hack.svg)](https://crates.io/crates/proc-macro-hack)
 
 As of Rust 1.30, the language supports user-defined function-like procedural
