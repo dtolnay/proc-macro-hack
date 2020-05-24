@@ -134,7 +134,9 @@ mod error;
 mod parse;
 
 use crate::error::{compile_error, Error};
-use crate::parse::*;
+use crate::parse::{
+    parse_define_args, parse_enum_hack, parse_export_args, parse_fake_call_site, parse_input,
+};
 use proc_macro::{token_stream, Ident, Punct, Spacing, Span, TokenStream, TokenTree};
 use std::fmt::Write;
 use std::iter::Peekable;
