@@ -131,17 +131,17 @@ extern crate proc_macro;
 mod quote;
 
 mod error;
+mod iter;
 mod parse;
 
 use crate::error::{compile_error, Error};
+use crate::iter::Iter;
 use crate::parse::{
     parse_define_args, parse_enum_hack, parse_export_args, parse_fake_call_site, parse_input,
 };
-use proc_macro::{token_stream, Ident, Punct, Spacing, Span, TokenStream, TokenTree};
+use proc_macro::{Ident, Punct, Spacing, Span, TokenStream, TokenTree};
 use std::fmt::Write;
-use std::iter::Peekable;
 
-type Iter<'a> = &'a mut Peekable<token_stream::IntoIter>;
 type Visibility = Option<Span>;
 
 enum Input {
@@ -171,8 +171,8 @@ struct Macro {
 
 #[proc_macro_attribute]
 pub fn proc_macro_hack(args: TokenStream, input: TokenStream) -> TokenStream {
-    let ref mut args = args.into_iter().peekable();
-    let ref mut input = input.into_iter().peekable();
+    let ref mut args = iter::new(args);
+    let ref mut input = iter::new(input);
     expand_proc_macro_hack(args, input).unwrap_or_else(compile_error)
 }
 
@@ -192,7 +192,7 @@ fn expand_proc_macro_hack(args: Iter, input: Iter) -> Result<TokenStream, Error>
 #[doc(hidden)]
 #[proc_macro_derive(ProcMacroHack)]
 pub fn enum_hack(input: TokenStream) -> TokenStream {
-    let ref mut input = input.into_iter().peekable();
+    let ref mut input = iter::new(input);
     parse_enum_hack(input).unwrap_or_else(compile_error)
 }
 
@@ -204,8 +204,8 @@ struct FakeCallSite {
 #[doc(hidden)]
 #[proc_macro_attribute]
 pub fn fake_call_site(args: TokenStream, input: TokenStream) -> TokenStream {
-    let ref mut args = args.into_iter().peekable();
-    let ref mut input = input.into_iter().peekable();
+    let ref mut args = iter::new(args);
+    let ref mut input = iter::new(input);
     expand_fake_call_site(args, input).unwrap_or_else(compile_error)
 }
 

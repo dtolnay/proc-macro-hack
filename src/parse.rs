@@ -1,7 +1,7 @@
-use crate::{Define, Error, Export, ExportArgs, FakeCallSite, Input, Iter, Macro, Visibility};
+use crate::iter::{self, Iter, IterImpl};
+use crate::{Define, Error, Export, ExportArgs, FakeCallSite, Input, Macro, Visibility};
 use proc_macro::Delimiter::{Brace, Bracket, Parenthesis};
-use proc_macro::{token_stream, Delimiter, Ident, Span, TokenStream, TokenTree};
-use std::iter::Peekable;
+use proc_macro::{Delimiter, Ident, Span, TokenStream, TokenTree};
 
 pub(crate) fn parse_input(tokens: Iter) -> Result<Input, Error> {
     let attrs = parse_attributes(tokens)?;
@@ -29,7 +29,7 @@ fn parse_export(attrs: TokenStream, vis: Visibility, tokens: Iter) -> Result<Exp
     let mut macros = Vec::new();
     match tokens.peek() {
         Some(TokenTree::Group(group)) if group.delimiter() == Brace => {
-            let ref mut content = group.stream().into_iter().peekable();
+            let ref mut content = iter::new(group.stream());
             loop {
                 macros.push(parse_macro(content)?);
                 if content.peek().is_none() {
@@ -124,13 +124,10 @@ fn parse_int(tokens: Iter) -> Result<u16, Span> {
     }
 }
 
-fn parse_group(
-    tokens: Iter,
-    delimiter: Delimiter,
-) -> Result<Peekable<token_stream::IntoIter>, Error> {
+fn parse_group(tokens: Iter, delimiter: Delimiter) -> Result<IterImpl, Error> {
     match &tokens.next() {
         Some(TokenTree::Group(group)) if group.delimiter() == delimiter => {
-            Ok(group.stream().into_iter().peekable())
+            Ok(iter::new(group.stream()))
         }
         tt => Err(Error::new(
             tt.as_ref().map_or_else(Span::call_site, TokenTree::span),
