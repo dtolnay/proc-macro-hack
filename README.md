@@ -22,7 +22,7 @@ Two crates are required to define a procedural macro.
 This crate must contain nothing but procedural macros. Private helper
 functions and private modules are fine but nothing can be public.
 
-[> example of an implementation crate][demo-hack-impl]
+[&raquo; example of an implementation crate][demo-hack-impl]
 
 Just like you would use a #\[proc_macro\] attribute to define a natively
 supported procedural macro, use proc-macro-hack's #\[proc_macro_hack\]
@@ -52,7 +52,7 @@ pub fn add_one(input: TokenStream) -> TokenStream {
 This crate is allowed to contain other public things if you need, for
 example traits or functions or ordinary macros.
 
-[> example of a declaration crate][demo-hack]
+[&raquo; example of a declaration crate][demo-hack]
 
 Within the declaration crate there needs to be a re-export of your
 procedural macro from the implementation crate. The re-export also carries a
@@ -88,7 +88,7 @@ proc-macro = true
 Users of your crate depend on your declaration crate (not your
 implementation crate), then use your procedural macros as usual.
 
-[> example of a downstream crate][example]
+[&raquo; example of a downstream crate][example]
 
 ```rust
 use demo_hack::add_one;
