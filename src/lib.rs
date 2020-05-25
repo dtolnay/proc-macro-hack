@@ -262,42 +262,29 @@ fn expand_export(export: Export, args: ExportArgs) -> TokenStream {
     };
 
     let from = export.from;
-    let mut rules = TokenStream::new();
+    let mut actual_names = TokenStream::new();
+    let mut export_dispatch = TokenStream::new();
+    let mut export_call_site = TokenStream::new();
+    let mut macro_rules = TokenStream::new();
     for Macro { name, export_as } in export.macros {
         let actual_name = actual_proc_macro_name(&name);
         let dispatch = dispatch_macro_name(&name);
         let call_site = call_site_macro_name(&name);
 
-        let export_dispatch = if args.support_nested {
-            quote! {
-                #[doc(hidden)]
-                #vis use proc_macro_nested::dispatch as #dispatch;
-            }
-        } else {
-            quote!()
-        };
+        if !actual_names.is_empty() {
+            actual_names.extend(quote!(,));
+        }
+        actual_names.extend(quote!(#actual_name));
 
-        let proc_macro_call = if args.support_nested {
-            let extra_bangs = (0..args.internal_macro_calls)
-                .map(|_| TokenTree::Punct(Punct::new('!', Spacing::Alone)))
-                .collect::<TokenStream>();
-            quote! {
-                #crate_prefix #dispatch! { ($($proc_macro)*) #extra_bangs }
-            }
-        } else {
-            quote! {
-                proc_macro_call!()
-            }
-        };
+        if !export_dispatch.is_empty() {
+            export_dispatch.extend(quote!(,));
+        }
+        export_dispatch.extend(quote!(dispatch as #dispatch));
 
-        let export_call_site = if args.fake_call_site {
-            quote! {
-                #[doc(hidden)]
-                #vis use proc_macro_hack::fake_call_site as #call_site;
-            }
-        } else {
-            quote!()
-        };
+        if !export_call_site.is_empty() {
+            export_call_site.extend(quote!(,));
+        }
+        export_call_site.extend(quote!(fake_call_site as #call_site));
 
         let do_derive = if !args.fake_call_site {
             quote! {
@@ -316,13 +303,20 @@ fn expand_export(export: Export, args: ExportArgs) -> TokenStream {
             }
         };
 
-        rules.extend(quote! {
-            #[doc(hidden)]
-            #vis use #from::#actual_name;
+        let proc_macro_call = if args.support_nested {
+            let extra_bangs = (0..args.internal_macro_calls)
+                .map(|_| TokenTree::Punct(Punct::new('!', Spacing::Alone)))
+                .collect::<TokenStream>();
+            quote! {
+                #crate_prefix #dispatch! { ($($proc_macro)*) #extra_bangs }
+            }
+        } else {
+            quote! {
+                proc_macro_call!()
+            }
+        };
 
-            #export_dispatch
-            #export_call_site
-
+        macro_rules.extend(quote! {
             #attrs
             #macro_export
             macro_rules! #export_as {
@@ -338,7 +332,35 @@ fn expand_export(export: Export, args: ExportArgs) -> TokenStream {
         });
     }
 
-    wrap_in_enum_hack(dummy, rules)
+    let export_dispatch = if args.support_nested {
+        quote! {
+            #[doc(hidden)]
+            #vis use proc_macro_nested::{#export_dispatch};
+        }
+    } else {
+        quote!()
+    };
+
+    let export_call_site = if args.fake_call_site {
+        quote! {
+            #[doc(hidden)]
+            #vis use proc_macro_hack::{#export_call_site};
+        }
+    } else {
+        quote!()
+    };
+
+    let expanded = quote! {
+        #[doc(hidden)]
+        #vis use #from::{#actual_names};
+
+        #export_dispatch
+        #export_call_site
+
+        #macro_rules
+    };
+
+    wrap_in_enum_hack(dummy, expanded)
 }
 
 fn expand_define(define: Define) -> TokenStream {
