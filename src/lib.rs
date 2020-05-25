@@ -262,84 +262,81 @@ fn expand_export(export: Export, args: ExportArgs) -> TokenStream {
     };
 
     let from = export.from;
-    let rules = export
-        .macros
-        .into_iter()
-        .map(|Macro { name, export_as }| {
-            let actual_name = actual_proc_macro_name(&name);
-            let dispatch = dispatch_macro_name(&name);
-            let call_site = call_site_macro_name(&name);
+    let mut rules = TokenStream::new();
+    for Macro { name, export_as } in export.macros {
+        let actual_name = actual_proc_macro_name(&name);
+        let dispatch = dispatch_macro_name(&name);
+        let call_site = call_site_macro_name(&name);
 
-            let export_dispatch = if args.support_nested {
-                quote! {
-                    #[doc(hidden)]
-                    #vis use proc_macro_nested::dispatch as #dispatch;
-                }
-            } else {
-                quote!()
-            };
-
-            let proc_macro_call = if args.support_nested {
-                let extra_bangs = (0..args.internal_macro_calls)
-                    .map(|_| TokenTree::Punct(Punct::new('!', Spacing::Alone)))
-                    .collect::<TokenStream>();
-                quote! {
-                    #crate_prefix #dispatch! { ($($proc_macro)*) #extra_bangs }
-                }
-            } else {
-                quote! {
-                    proc_macro_call!()
-                }
-            };
-
-            let export_call_site = if args.fake_call_site {
-                quote! {
-                    #[doc(hidden)]
-                    #vis use proc_macro_hack::fake_call_site as #call_site;
-                }
-            } else {
-                quote!()
-            };
-
-            let do_derive = if !args.fake_call_site {
-                quote! {
-                    #[derive(#crate_prefix #actual_name)]
-                }
-            } else if crate_prefix.is_some() {
-                quote! {
-                    use #crate_prefix #actual_name;
-                    #[#crate_prefix #call_site ($($proc_macro)*)]
-                    #[derive(#actual_name)]
-                }
-            } else {
-                quote! {
-                    #[#call_site ($($proc_macro)*)]
-                    #[derive(#actual_name)]
-                }
-            };
-
+        let export_dispatch = if args.support_nested {
             quote! {
                 #[doc(hidden)]
-                #vis use #from::#actual_name;
-
-                #export_dispatch
-                #export_call_site
-
-                #attrs
-                #macro_export
-                macro_rules! #export_as {
-                    ($($proc_macro:tt)*) => {{
-                        #do_derive
-                        #[allow(dead_code)]
-                        enum ProcMacroHack {
-                            #enum_variant = (stringify! { $($proc_macro)* }, 0).1,
-                        }
-                        #proc_macro_call
-                    }};
-                }
+                #vis use proc_macro_nested::dispatch as #dispatch;
             }
-        })
-        .collect();
+        } else {
+            quote!()
+        };
+
+        let proc_macro_call = if args.support_nested {
+            let extra_bangs = (0..args.internal_macro_calls)
+                .map(|_| TokenTree::Punct(Punct::new('!', Spacing::Alone)))
+                .collect::<TokenStream>();
+            quote! {
+                #crate_prefix #dispatch! { ($($proc_macro)*) #extra_bangs }
+            }
+        } else {
+            quote! {
+                proc_macro_call!()
+            }
+        };
+
+        let export_call_site = if args.fake_call_site {
+            quote! {
+                #[doc(hidden)]
+                #vis use proc_macro_hack::fake_call_site as #call_site;
+            }
+        } else {
+            quote!()
+        };
+
+        let do_derive = if !args.fake_call_site {
+            quote! {
+                #[derive(#crate_prefix #actual_name)]
+            }
+        } else if crate_prefix.is_some() {
+            quote! {
+                use #crate_prefix #actual_name;
+                #[#crate_prefix #call_site ($($proc_macro)*)]
+                #[derive(#actual_name)]
+            }
+        } else {
+            quote! {
+                #[#call_site ($($proc_macro)*)]
+                #[derive(#actual_name)]
+            }
+        };
+
+        rules.extend(quote! {
+            #[doc(hidden)]
+            #vis use #from::#actual_name;
+
+            #export_dispatch
+            #export_call_site
+
+            #attrs
+            #macro_export
+            macro_rules! #export_as {
+                ($($proc_macro:tt)*) => {{
+                    #do_derive
+                    #[allow(dead_code)]
+                    enum ProcMacroHack {
+                        #enum_variant = (stringify! { $($proc_macro)* }, 0).1,
+                    }
+                    #proc_macro_call
+                }};
+            }
+        });
+    }
 
     wrap_in_enum_hack(dummy, rules)
 }
