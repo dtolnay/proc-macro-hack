@@ -266,7 +266,7 @@ fn expand_export(export: Export, args: ExportArgs) -> TokenStream {
     let mut export_dispatch = TokenStream::new();
     let mut export_call_site = TokenStream::new();
     let mut macro_rules = TokenStream::new();
-    for Macro { name, export_as } in export.macros {
+    for Macro { name, export_as } in &export.macros {
         let actual_name = actual_proc_macro_name(&name);
         let dispatch = dispatch_macro_name(&name);
         let call_site = call_site_macro_name(&name);
@@ -332,10 +332,16 @@ fn expand_export(export: Export, args: ExportArgs) -> TokenStream {
         });
     }
 
+    if export.macros.len() != 1 {
+        export_dispatch = quote!({#export_dispatch});
+        export_call_site = quote!({#export_call_site});
+        actual_names = quote!({#actual_names});
+    }
+
     let export_dispatch = if args.support_nested {
         quote! {
             #[doc(hidden)]
-            #vis use proc_macro_nested::{#export_dispatch};
+            #vis use proc_macro_nested::#export_dispatch;
         }
     } else {
         quote!()
@@ -344,7 +350,7 @@ fn expand_export(export: Export, args: ExportArgs) -> TokenStream {
     let export_call_site = if args.fake_call_site {
         quote! {
             #[doc(hidden)]
-            #vis use proc_macro_hack::{#export_call_site};
+            #vis use proc_macro_hack::#export_call_site;
         }
     } else {
         quote!()
@@ -352,7 +358,7 @@ fn expand_export(export: Export, args: ExportArgs) -> TokenStream {
 
     let expanded = quote! {
         #[doc(hidden)]
-        #vis use #from::{#actual_names};
+        #vis use #from::#actual_names;
 
         #export_dispatch
         #export_call_site
