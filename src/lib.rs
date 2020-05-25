@@ -332,6 +332,16 @@ fn expand_export(export: Export, args: ExportArgs) -> TokenStream {
         });
     }
 
+    let extern_crate = if cfg!(proc_macro_hack_no_crate_as_underscore) {
+        quote!()
+    } else {
+        quote! {
+            #[allow(unused_imports)]
+            #[macro_use]
+            extern crate #from as _;
+        }
+    };
+
     if export.macros.len() != 1 {
         export_dispatch = quote!({#export_dispatch});
         export_call_site = quote!({#export_call_site});
@@ -357,6 +367,8 @@ fn expand_export(export: Export, args: ExportArgs) -> TokenStream {
     };
 
     let expanded = quote! {
+        #extern_crate
+
         #[doc(hidden)]
         #vis use #from::#actual_names;
 
