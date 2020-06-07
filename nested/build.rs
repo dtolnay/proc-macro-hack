@@ -16,6 +16,9 @@ macro_rules! count {
 */
 
 fn main() {
+    // Tell Cargo not to rerun on src/lib.rs changes.
+    println!("cargo:rerun-if-changed=build.rs");
+
     let out_dir = env::var("OUT_DIR").unwrap();
     let dest_path = Path::new(&out_dir).join("count.rs");
     let mut f = File::create(&dest_path).unwrap();
