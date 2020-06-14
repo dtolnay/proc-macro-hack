@@ -1,6 +1,5 @@
 use std::env;
-use std::fs::File;
-use std::io::Write;
+use std::fs;
 use std::iter;
 use std::path::Path;
 
@@ -21,7 +20,6 @@ fn main() {
 
     let out_dir = env::var("OUT_DIR").unwrap();
     let dest_path = Path::new(&out_dir).join("count.rs");
-    let mut f = File::create(&dest_path).unwrap();
 
     let mut content = String::new();
     content += "
@@ -40,5 +38,5 @@ fn main() {
         }
     ";
 
-    f.write_all(content.as_bytes()).unwrap();
+    fs::write(dest_path, content).unwrap();
 }
