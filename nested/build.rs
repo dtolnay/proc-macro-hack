@@ -19,21 +19,17 @@ fn main() {
     println!("cargo:rerun-if-changed=build.rs");
 
     let mut content = String::new();
-    content += "
-        #[doc(hidden)]
-        #[macro_export]
-        macro_rules! count {
-    ";
+    content += "#[doc(hidden)]\n";
+    content += "#[macro_export]\n";
+    content += "macro_rules! count {\n";
     for i in 0..=64 {
         let bangs = iter::repeat("!").take(i).collect::<String>();
-        content += &format!("({}) => {{ proc_macro_call_{}!() }};", bangs, i);
+        content += &format!("    ({}) => {{ proc_macro_call_{}!() }};\n", bangs, i);
     }
-    content += "
-            ($(!)+) => {
-                compile_error!(\"this macro does not support >64 nested macro invocations\")
-            };
-        }
-    ";
+    content += "    ($(!)+) => {\n";
+    content += "        compile_error! { \"this macro does not support >64 nested macro invocations\" }\n";
+    content += "    };\n";
+    content += "}\n";
 
     let content = content.as_bytes();
     let out_dir = env::var("OUT_DIR").unwrap();
