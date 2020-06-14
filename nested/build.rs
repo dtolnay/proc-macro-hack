@@ -18,9 +18,6 @@ fn main() {
     // Tell Cargo not to rerun on src/lib.rs changes.
     println!("cargo:rerun-if-changed=build.rs");
 
-    let out_dir = env::var("OUT_DIR").unwrap();
-    let dest_path = Path::new(&out_dir).join("count.rs");
-
     let mut content = String::new();
     content += "
         #[doc(hidden)]
@@ -38,5 +35,16 @@ fn main() {
         }
     ";
 
-    fs::write(dest_path, content).unwrap();
+    let content = content.as_bytes();
+    let out_dir = env::var("OUT_DIR").unwrap();
+    let ref dest_path = Path::new(&out_dir).join("count.rs");
+
+    // Avoid bumping filetime if content is up to date. Possibly related to
+    // https://github.com/dtolnay/proc-macro-hack/issues/56 ...?
+    if fs::read(dest_path)
+        .map(|existing| existing != content)
+        .unwrap_or(true)
+    {
+        fs::write(dest_path, content).unwrap();
+    }
 }
