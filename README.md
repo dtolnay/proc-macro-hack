@@ -33,8 +33,6 @@ The function signature is the same as for ordinary function-like procedural
 macros.
 
 ```rust
-extern crate proc_macro;
-
 use proc_macro::TokenStream;
 use proc_macro_hack::proc_macro_hack;
 use quote::quote;

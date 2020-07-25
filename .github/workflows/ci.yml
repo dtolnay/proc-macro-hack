@@ -12,11 +12,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        rust: [nightly, beta, stable, 1.31.0]
+        rust: [nightly, beta, stable, 1.42.0, 1.31.0]
     steps:
       - uses: actions/checkout@v2
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{matrix.rust}}
+      - if: matrix.rust == '1.31.0'
+        run: echo 'extern crate proc_macro;' >> demo-hack-impl/src/lib.rs
       - run: cargo run --manifest-path example/Cargo.toml
       - run: cargo test --all
