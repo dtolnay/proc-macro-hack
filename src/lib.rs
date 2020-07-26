@@ -6,7 +6,13 @@
 //!
 //! <br>
 //!
-//! As of Rust 1.30, the language supports user-defined function-like procedural
+//! <table><tr><td><hr>
+//! <b>Note:</b> <i>As of Rust 1.45 this crate is superseded by native support
+//! for #[proc_macro] in expression position. Only consider using this crate if
+//! you care about supporting compilers between 1.31 and 1.45.</i>
+//! <hr></td></tr></table>
+//!
+//! Since Rust 1.30, the language supports user-defined function-like procedural
 //! macros. However these can only be invoked in item position, not in
 //! statements or expressions.
 //!
