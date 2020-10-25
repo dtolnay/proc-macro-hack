@@ -1,6 +1,7 @@
 mod parse;
 
-use self::parse::{parse_define_args, parse_export_args, parse_fake_call_site, parse_input};
+use self::parse::{parse_fake_call_site, parse_input};
+use crate::args::{parse_define_args, parse_export_args};
 use crate::error::Error;
 use crate::iter::{self, Iter};
 use crate::{ExportArgs, Visibility};
