@@ -1,5 +1,5 @@
+use super::{Define, Error, Export, ExportArgs, FakeCallSite, Input, Macro, Visibility};
 use crate::iter::{self, Iter, IterImpl};
-use crate::{Define, Error, Export, ExportArgs, FakeCallSite, Input, Macro, Visibility};
 use proc_macro::Delimiter::{Brace, Bracket, Parenthesis};
 use proc_macro::{Delimiter, Ident, Span, TokenStream, TokenTree};
 
