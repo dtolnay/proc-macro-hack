@@ -40,8 +40,10 @@
 
 #![no_std]
 
+#[cfg(not(fn_like_proc_macro))]
 include!(concat!(env!("OUT_DIR"), "/count.rs"));
 
+#[cfg(not(fn_like_proc_macro))]
 #[doc(hidden)]
 #[macro_export]
 macro_rules! dispatch {
