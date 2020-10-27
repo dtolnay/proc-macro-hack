@@ -189,7 +189,7 @@ pub(crate) fn parse_export_args(tokens: Iter) -> Result<ExportArgs, Error> {
                 return Err(Error::new(
                     tt.span(),
                     "expected one of: `support_nested`, `internal_macro_calls`, `fake_call_site`",
-                ))
+                ));
             }
         }
         if tokens.peek().is_none() {
