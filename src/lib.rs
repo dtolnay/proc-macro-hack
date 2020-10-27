@@ -244,6 +244,7 @@ struct ExportArgs {
     support_nested: bool,
     internal_macro_calls: u16,
     fake_call_site: bool,
+    only_hack_old_rustc: bool,
 }
 
 fn expand_export(export: Export, args: ExportArgs) -> TokenStream {
