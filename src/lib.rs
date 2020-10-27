@@ -156,7 +156,7 @@ use crate::parse::{
 use proc_macro::{Ident, Punct, Spacing, Span, TokenStream, TokenTree};
 use std::fmt::Write;
 
-type Visibility = Option<Span>;
+type Visibility = Option<Ident>;
 
 enum Input {
     Export(Export),
@@ -250,7 +250,7 @@ fn expand_export(export: Export, args: ExportArgs) -> TokenStream {
     let dummy = dummy_name_for_export(&export);
 
     let attrs = export.attrs;
-    let ref vis = export.vis.map(|span| Ident::new("pub", span));
+    let vis = export.vis;
     let macro_export = match vis {
         Some(_) => quote!(#[macro_export]),
         None => quote!(),

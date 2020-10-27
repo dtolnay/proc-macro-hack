@@ -139,7 +139,10 @@ fn parse_group(tokens: Iter, delimiter: Delimiter) -> Result<IterImpl, Error> {
 fn parse_visibility(tokens: Iter) -> Result<Visibility, Error> {
     if let Some(TokenTree::Ident(ident)) = tokens.peek() {
         if ident.to_string() == "pub" {
-            return Ok(Some(tokens.next().unwrap().span()));
+            match tokens.next().unwrap() {
+                TokenTree::Ident(vis) => return Ok(Some(vis)),
+                _ => unreachable!(),
+            }
         }
     }
     Ok(None)
