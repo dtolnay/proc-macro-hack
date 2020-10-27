@@ -202,10 +202,12 @@ pub(crate) fn parse_export_args(tokens: Iter) -> Result<ExportArgs, Error> {
 }
 
 pub(crate) fn parse_define_args(tokens: Iter) -> Result<(), Error> {
-    if tokens.peek().is_none() {
-        Ok(())
-    } else {
-        Err(Error::new(Span::call_site(), "unexpected input"))
+    match tokens.peek() {
+        None => Ok(()),
+        Some(token) => Err(Error::new(
+            token.span(),
+            "unexpected argument to proc_macro_hack macro implementation; args are only accepted on the macro declaration (the `pub use`)",
+        )),
     }
 }
 
