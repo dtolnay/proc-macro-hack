@@ -274,14 +274,14 @@ fn expand_export(export: Export, args: ExportArgs) -> TokenStream {
     let mut export_call_site = TokenStream::new();
     let mut macro_rules = TokenStream::new();
     for Macro { name, export_as } in &export.macros {
-        let pub_name = pub_proc_macro_name(&name);
+        let hacked = hacked_proc_macro_name(&name);
         let dispatch = dispatch_macro_name(&name);
         let call_site = call_site_macro_name(&name);
 
         if !actual_names.is_empty() {
             actual_names.extend(quote!(,));
         }
-        actual_names.extend(quote!(#pub_name));
+        actual_names.extend(quote!(#hacked));
 
         if !export_dispatch.is_empty() {
             export_dispatch.extend(quote!(,));
@@ -295,18 +295,18 @@ fn expand_export(export: Export, args: ExportArgs) -> TokenStream {
 
         let do_derive = if !args.fake_call_site {
             quote! {
-                #[derive(#crate_prefix #pub_name)]
+                #[derive(#crate_prefix #hacked)]
             }
         } else if crate_prefix.is_some() {
             quote! {
-                use #crate_prefix #pub_name;
+                use #crate_prefix #hacked;
                 #[#crate_prefix #call_site ($($proc_macro)*)]
-                #[derive(#pub_name)]
+                #[derive(#hacked)]
             }
         } else {
             quote! {
                 #[#call_site ($($proc_macro)*)]
-                #[derive(#pub_name)]
+                #[derive(#hacked)]
             }
         };
 
@@ -380,7 +380,7 @@ fn expand_define(define: Define) -> TokenStream {
     let attrs = define.attrs;
     let name = define.name;
     let pub_name = pub_proc_macro_name(&name);
-    let nohack = original_proc_macro_name(&name);
+    let hacked = hacked_proc_macro_name(&name);
     let body = define.body;
 
     quote! {
@@ -390,8 +390,9 @@ fn expand_define(define: Define) -> TokenStream {
         }
 
         #attrs
-        #[proc_macro_derive(#pub_name)]
-        pub fn #pub_name(input: #pub_name::TokenStream) -> #pub_name::TokenStream {
+        #[doc(hidden)]
+        #[proc_macro_derive(#hacked)]
+        pub fn #hacked(input: #pub_name::TokenStream) -> #pub_name::TokenStream {
             use std::iter::FromIterator;
 
             let mut iter = input.into_iter();
@@ -486,9 +487,8 @@ fn expand_define(define: Define) -> TokenStream {
         }
 
         #attrs
-        #[doc(hidden)]
         #[proc_macro]
-        pub fn #nohack(input: #pub_name::TokenStream) -> #pub_name::TokenStream {
+        pub fn #pub_name(input: #pub_name::TokenStream) -> #pub_name::TokenStream {
             #name(input)
         }
 
@@ -503,9 +503,9 @@ fn pub_proc_macro_name(conceptual: &Ident) -> Ident {
     )
 }
 
-fn original_proc_macro_name(conceptual: &Ident) -> Ident {
+fn hacked_proc_macro_name(conceptual: &Ident) -> Ident {
     Ident::new(
-        &format!("proc_macro_nohack_{}", conceptual),
+        &format!("_proc_macro_hack_{}", conceptual),
         conceptual.span(),
     )
 }
