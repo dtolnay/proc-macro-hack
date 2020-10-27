@@ -273,14 +273,14 @@ fn expand_export(export: Export, args: ExportArgs) -> TokenStream {
     let mut export_call_site = TokenStream::new();
     let mut macro_rules = TokenStream::new();
     for Macro { name, export_as } in &export.macros {
-        let actual_name = actual_proc_macro_name(&name);
+        let pub_name = pub_proc_macro_name(&name);
         let dispatch = dispatch_macro_name(&name);
         let call_site = call_site_macro_name(&name);
 
         if !actual_names.is_empty() {
             actual_names.extend(quote!(,));
         }
-        actual_names.extend(quote!(#actual_name));
+        actual_names.extend(quote!(#pub_name));
 
         if !export_dispatch.is_empty() {
             export_dispatch.extend(quote!(,));
@@ -294,18 +294,18 @@ fn expand_export(export: Export, args: ExportArgs) -> TokenStream {
 
         let do_derive = if !args.fake_call_site {
             quote! {
-                #[derive(#crate_prefix #actual_name)]
+                #[derive(#crate_prefix #pub_name)]
             }
         } else if crate_prefix.is_some() {
             quote! {
-                use #crate_prefix #actual_name;
+                use #crate_prefix #pub_name;
                 #[#crate_prefix #call_site ($($proc_macro)*)]
-                #[derive(#actual_name)]
+                #[derive(#pub_name)]
             }
         } else {
             quote! {
                 #[#call_site ($($proc_macro)*)]
-                #[derive(#actual_name)]
+                #[derive(#pub_name)]
             }
         };
 
@@ -378,18 +378,18 @@ fn expand_export(export: Export, args: ExportArgs) -> TokenStream {
 fn expand_define(define: Define) -> TokenStream {
     let attrs = define.attrs;
     let name = define.name;
-    let dummy = actual_proc_macro_name(&name);
+    let pub_name = pub_proc_macro_name(&name);
     let body = define.body;
 
     quote! {
-        mod #dummy {
+        mod #pub_name {
             extern crate proc_macro;
             pub use self::proc_macro::*;
         }
 
         #attrs
-        #[proc_macro_derive(#dummy)]
-        pub fn #dummy(input: #dummy::TokenStream) -> #dummy::TokenStream {
+        #[proc_macro_derive(#pub_name)]
+        pub fn #pub_name(input: #pub_name::TokenStream) -> #pub_name::TokenStream {
             use std::iter::FromIterator;
 
             let mut iter = input.into_iter();
@@ -399,7 +399,7 @@ fn expand_define(define: Define) -> TokenStream {
             iter.next().unwrap(); // `[allow(dead_code)]`
 
             let mut braces = match iter.next().unwrap() {
-                #dummy::TokenTree::Group(group) => group.stream().into_iter(),
+                #pub_name::TokenTree::Group(group) => group.stream().into_iter(),
                 _ => unimplemented!(),
             };
             let variant = braces.next().unwrap(); // `Value` or `Nested`
@@ -408,29 +408,29 @@ fn expand_define(define: Define) -> TokenStream {
             braces.next().unwrap(); // `=`
 
             let mut parens = match braces.next().unwrap() {
-                #dummy::TokenTree::Group(group) => group.stream().into_iter(),
+                #pub_name::TokenTree::Group(group) => group.stream().into_iter(),
                 _ => unimplemented!(),
             };
             parens.next().unwrap(); // `stringify`
             parens.next().unwrap(); // `!`
 
             let inner = match parens.next().unwrap() {
-                #dummy::TokenTree::Group(group) => group.stream(),
+                #pub_name::TokenTree::Group(group) => group.stream(),
                 _ => unimplemented!(),
             };
 
-            let output: #dummy::TokenStream = #name(inner.clone());
+            let output: #pub_name::TokenStream = #name(inner.clone());
 
-            fn count_bangs(input: #dummy::TokenStream) -> usize {
+            fn count_bangs(input: #pub_name::TokenStream) -> usize {
                 let mut count = 0;
                 for token in input {
                     match token {
-                        #dummy::TokenTree::Punct(punct) => {
+                        #pub_name::TokenTree::Punct(punct) => {
                             if punct.as_char() == '!' {
                                 count += 1;
                             }
                         }
-                        #dummy::TokenTree::Group(group) => {
+                        #pub_name::TokenTree::Group(group) => {
                             count += count_bangs(group.stream());
                         }
                         _ => {}
@@ -442,15 +442,15 @@ fn expand_define(define: Define) -> TokenStream {
             // macro_rules! proc_macro_call {
             //     () => { #output }
             // }
-            #dummy::TokenStream::from_iter(vec![
-                #dummy::TokenTree::Ident(
-                    #dummy::Ident::new("macro_rules", #dummy::Span::call_site()),
+            #pub_name::TokenStream::from_iter(vec![
+                #pub_name::TokenTree::Ident(
+                    #pub_name::Ident::new("macro_rules", #pub_name::Span::call_site()),
                 ),
-                #dummy::TokenTree::Punct(
-                    #dummy::Punct::new('!', #dummy::Spacing::Alone),
+                #pub_name::TokenTree::Punct(
+                    #pub_name::Punct::new('!', #pub_name::Spacing::Alone),
                 ),
-                #dummy::TokenTree::Ident(
-                    #dummy::Ident::new(
+                #pub_name::TokenTree::Ident(
+                    #pub_name::Ident::new(
                         &if support_nested {
                             let extra_bangs = if varname == "Nested" {
                                 0
@@ -461,22 +461,22 @@ fn expand_define(define: Define) -> TokenStream {
                         } else {
                             String::from("proc_macro_call")
                         },
-                        #dummy::Span::call_site(),
+                        #pub_name::Span::call_site(),
                     ),
                 ),
-                #dummy::TokenTree::Group(
-                    #dummy::Group::new(#dummy::Delimiter::Brace, #dummy::TokenStream::from_iter(vec![
-                        #dummy::TokenTree::Group(
-                            #dummy::Group::new(#dummy::Delimiter::Parenthesis, #dummy::TokenStream::new()),
+                #pub_name::TokenTree::Group(
+                    #pub_name::Group::new(#pub_name::Delimiter::Brace, #pub_name::TokenStream::from_iter(vec![
+                        #pub_name::TokenTree::Group(
+                            #pub_name::Group::new(#pub_name::Delimiter::Parenthesis, #pub_name::TokenStream::new()),
                         ),
-                        #dummy::TokenTree::Punct(
-                            #dummy::Punct::new('=', #dummy::Spacing::Joint),
+                        #pub_name::TokenTree::Punct(
+                            #pub_name::Punct::new('=', #pub_name::Spacing::Joint),
                         ),
-                        #dummy::TokenTree::Punct(
-                            #dummy::Punct::new('>', #dummy::Spacing::Alone),
+                        #pub_name::TokenTree::Punct(
+                            #pub_name::Punct::new('>', #pub_name::Spacing::Alone),
                         ),
-                        #dummy::TokenTree::Group(
-                            #dummy::Group::new(#dummy::Delimiter::Brace, output),
+                        #pub_name::TokenTree::Group(
+                            #pub_name::Group::new(#pub_name::Delimiter::Brace, output),
                         ),
                     ])),
                 ),
@@ -487,7 +487,7 @@ fn expand_define(define: Define) -> TokenStream {
     }
 }
 
-fn actual_proc_macro_name(conceptual: &Ident) -> Ident {
+fn pub_proc_macro_name(conceptual: &Ident) -> Ident {
     Ident::new(
         &format!("proc_macro_hack_{}", conceptual),
         conceptual.span(),
