@@ -248,6 +248,10 @@ struct ExportArgs {
 }
 
 fn expand_export(export: Export, args: ExportArgs) -> TokenStream {
+    if args.only_hack_old_rustc && cfg!(not(need_proc_macro_hack)) {
+        return expand_export_nohack(export);
+    }
+
     let dummy = dummy_name_for_export(&export);
 
     let attrs = export.attrs;
@@ -374,6 +378,30 @@ fn expand_export(export: Export, args: ExportArgs) -> TokenStream {
     };
 
     wrap_in_enum_hack(dummy, expanded)
+}
+
+fn expand_export_nohack(export: Export) -> TokenStream {
+    let attrs = export.attrs;
+    let vis = export.vis;
+    let from = export.from;
+    let mut names = TokenStream::new();
+
+    for Macro { name, export_as } in &export.macros {
+        let pub_name = pub_proc_macro_name(&name);
+        if !names.is_empty() {
+            names.extend(quote!(,));
+        }
+        names.extend(quote!(#pub_name as #export_as));
+    }
+
+    if export.macros.len() != 1 {
+        names = quote!({#names});
+    }
+
+    quote! {
+        #attrs
+        #vis use #from::#names;
+    }
 }
 
 fn expand_define(define: Define) -> TokenStream {
