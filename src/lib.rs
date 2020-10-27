@@ -380,6 +380,7 @@ fn expand_define(define: Define) -> TokenStream {
     let attrs = define.attrs;
     let name = define.name;
     let pub_name = pub_proc_macro_name(&name);
+    let nohack = original_proc_macro_name(&name);
     let body = define.body;
 
     quote! {
@@ -484,6 +485,13 @@ fn expand_define(define: Define) -> TokenStream {
             ])
         }
 
+        #attrs
+        #[doc(hidden)]
+        #[proc_macro]
+        pub fn #nohack(input: #pub_name::TokenStream) -> #pub_name::TokenStream {
+            #name(input)
+        }
+
         fn #name #body
     }
 }
@@ -491,6 +499,13 @@ fn expand_define(define: Define) -> TokenStream {
 fn pub_proc_macro_name(conceptual: &Ident) -> Ident {
     Ident::new(
         &format!("proc_macro_hack_{}", conceptual),
+        conceptual.span(),
+    )
+}
+
+fn original_proc_macro_name(conceptual: &Ident) -> Ident {
+    Ident::new(
+        &format!("proc_macro_nohack_{}", conceptual),
         conceptual.span(),
     )
 }
