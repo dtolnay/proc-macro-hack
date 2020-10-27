@@ -126,6 +126,13 @@ fn main() {
   macro input, use `#[proc_macro_hack(fake_call_site)]` on the re-export in your
   declaration crate. *Most macros won't need this.*
 
+- On compilers that are new enough to natively support proc macros in expression
+  position, proc-macro-hack does not automatically use that support, since the
+  hygiene can be subtly different between the two implementations. To opt in to
+  compiling your macro to native `#[proc_macro]` on sufficiently new compilers,
+  use `#[proc_macro_hack(only_hack_old_rustc)]` on the re-export in your
+  declaration crate.
+
 [#10]: https://github.com/dtolnay/proc-macro-hack/issues/10
 [#20]: https://github.com/dtolnay/proc-macro-hack/issues/20
 [`proc-macro-nested`]: https://docs.rs/proc-macro-nested
