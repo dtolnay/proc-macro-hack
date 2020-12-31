@@ -146,8 +146,12 @@
 
 #![recursion_limit = "512"]
 #![allow(
+    clippy::doc_markdown,
     clippy::manual_strip,
+    clippy::module_name_repetitions,
     clippy::needless_doctest_main,
+    clippy::needless_pass_by_value,
+    clippy::too_many_lines,
     clippy::toplevel_ref_arg
 )]
 
