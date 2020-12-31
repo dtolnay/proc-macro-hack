@@ -148,8 +148,7 @@
 #![allow(
     clippy::manual_strip,
     clippy::needless_doctest_main,
-    clippy::toplevel_ref_arg,
-    clippy::unnecessary_wraps
+    clippy::toplevel_ref_arg
 )]
 
 extern crate proc_macro;
