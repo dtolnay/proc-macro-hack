@@ -145,7 +145,12 @@
 //! [`proc-macro-nested`]: https://docs.rs/proc-macro-nested
 
 #![recursion_limit = "512"]
-#![allow(clippy::needless_doctest_main, clippy::toplevel_ref_arg)]
+#![allow(
+    clippy::manual_strip,
+    clippy::needless_doctest_main,
+    clippy::toplevel_ref_arg,
+    clippy::unnecessary_wraps
+)]
 
 extern crate proc_macro;
 

@@ -22,3 +22,11 @@ jobs:
         run: echo 'extern crate proc_macro;' >> demo-hack-impl/src/lib.rs
       - run: cargo run --manifest-path example/Cargo.toml
       - run: cargo test --all
+
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dtolnay/rust-toolchain@clippy
+      - run: cargo clippy --tests -- -Dclippy::all
