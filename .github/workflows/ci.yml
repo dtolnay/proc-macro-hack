@@ -28,6 +28,14 @@ jobs:
       - run: cargo run --manifest-path example/Cargo.toml
       - run: cargo test --all
 
+  repro:
+    name: Repro
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dtolnay/rust-toolchain@nightly
+      - run: cargo build --manifest-path repro/Cargo.toml
+
   clippy:
     name: Clippy
     runs-on: ubuntu-latest
