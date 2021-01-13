@@ -1,7 +1,7 @@
 use std::env;
 use std::fs;
 use std::iter;
-use std::path::Path;
+use std::path::{self, Path};
 
 /*
 #[doc(hidden)]
@@ -45,4 +45,6 @@ fn main() {
     {
         fs::write(dest_path, content).unwrap();
     }
+
+    println!("cargo:rustc-env=PATH_SEPARATOR={}", path::MAIN_SEPARATOR);
 }
