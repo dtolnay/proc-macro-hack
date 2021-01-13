@@ -33,7 +33,9 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: dtolnay/rust-toolchain@nightly
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
       - run: cargo build --manifest-path repro/Cargo.toml
 
   clippy:
