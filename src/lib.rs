@@ -147,6 +147,7 @@
 #![recursion_limit = "512"]
 #![allow(
     clippy::doc_markdown,
+    clippy::let_underscore_drop,
     clippy::manual_strip,
     clippy::module_name_repetitions,
     clippy::needless_doctest_main,
