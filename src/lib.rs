@@ -282,25 +282,46 @@ macro_rules! proc_macro_expr_impl {
             #[proc_macro_derive($func)]
             pub fn $func(input: $func::TokenStream) -> $func::TokenStream {
                 let source = input.to_string();
-                let source = source.trim();
+                let mut tokens = source.trim();
 
-                let prefix = "#[allow(unused)]\nenum ProcMacroHack {";
-                let suffix = "}";
-                assert!(source.starts_with(prefix));
-                assert!(source.ends_with(suffix));
-                let source = &source[prefix.len() .. source.len() - suffix.len()].trim();
+                for &prefix in &[
+                    "#",
+                    "[",
+                    "allow",
+                    "(",
+                    "unused",
+                    ")",
+                    "]",
+                    "enum",
+                    "ProcMacroHack",
+                    "{",
+                    "Input",
+                    "=",
+                    "(",
+                    "stringify",
+                    "!",
+                    "(",
+                ] {
+                    assert!(tokens.starts_with(prefix));
+                    tokens = &tokens[prefix.len()..].trim();
+                }
 
-                let prefix = "Input =";
-                let suffix = "0).1,";
-                assert!(source.starts_with(prefix));
-                assert!(source.ends_with(suffix));
-                let source = &source[prefix.len() .. source.len() - suffix.len()].trim();
-
-                let prefix = "(stringify!(";
-                let suffix = "),";
-                assert!(source.starts_with(prefix));
-                assert!(source.ends_with(suffix));
-                let tokens = &source[prefix.len() .. source.len() - suffix.len()].trim();
+                for &suffix in &[
+                    "}",
+                    ",",
+                    "1",
+                    ".",
+                    ")",
+                    "0",
+                    ",",
+                    ")",
+                ] {
+                    if suffix == "," && !tokens.ends_with(suffix) {
+                        continue;
+                    }
+                    assert!(tokens.ends_with(suffix));
+                    tokens = &tokens[..tokens.len() - suffix.len()].trim();
+                }
 
                 fn func($input: &str) -> String $body
 
@@ -350,25 +371,46 @@ macro_rules! proc_macro_item_impl {
             #[proc_macro_derive($func)]
             pub fn $func(input: $func::TokenStream) -> $func::TokenStream {
                 let source = input.to_string();
-                let source = source.trim();
+                let mut tokens = source.trim();
 
-                let prefix = "#[allow(unused)]\nenum ProcMacroHack {";
-                let suffix = "}";
-                assert!(source.starts_with(prefix));
-                assert!(source.ends_with(suffix));
-                let source = &source[prefix.len() .. source.len() - suffix.len()].trim();
+                for &prefix in &[
+                    "#",
+                    "[",
+                    "allow",
+                    "(",
+                    "unused",
+                    ")",
+                    "]",
+                    "enum",
+                    "ProcMacroHack",
+                    "{",
+                    "Input",
+                    "=",
+                    "(",
+                    "stringify",
+                    "!",
+                    "(",
+                ] {
+                    assert!(tokens.starts_with(prefix));
+                    tokens = &tokens[prefix.len()..].trim();
+                }
 
-                let prefix = "Input =";
-                let suffix = "0).1,";
-                assert!(source.starts_with(prefix));
-                assert!(source.ends_with(suffix));
-                let source = &source[prefix.len() .. source.len() - suffix.len()].trim();
-
-                let prefix = "(stringify!(";
-                let suffix = "),";
-                assert!(source.starts_with(prefix));
-                assert!(source.ends_with(suffix));
-                let tokens = &source[prefix.len() .. source.len() - suffix.len()].trim();
+                for &suffix in &[
+                    "}",
+                    ",",
+                    "1",
+                    ".",
+                    ")",
+                    "0",
+                    ",",
+                    ")",
+                ] {
+                    if suffix == "," && !tokens.ends_with(suffix) {
+                        continue;
+                    }
+                    assert!(tokens.ends_with(suffix));
+                    tokens = &tokens[..tokens.len() - suffix.len()].trim();
+                }
 
                 fn func($input: &str) -> String $body
 
