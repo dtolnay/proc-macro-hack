@@ -1,13 +1,13 @@
 [package]
 name = "proc-macro-hack"
-version = "0.4.2"
+version = "0.4.3"
 authors = ["David Tolnay <dtolnay@gmail.com>"]
 license = "MIT/Apache-2.0"
 description = "Procedural functionlike!() macros using only Macros 1.1"
 repository = "https://github.com/dtolnay/proc-macro-hack"
 
 [dependencies]
-proc-macro-hack-impl = { version = "=0.4.2", path = "impl" }
+proc-macro-hack-impl = { version = "=0.4.3", path = "impl" }
 
 [dev-dependencies]
 demo-hack = { version = "0.0.4", path = "demo-hack" }
