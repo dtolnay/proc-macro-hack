@@ -295,9 +295,9 @@ fn expand_export(export: Export, args: ExportArgs) -> TokenStream {
     let mut export_call_site = TokenStream::new();
     let mut macro_rules = TokenStream::new();
     for Macro { name, export_as } in &export.macros {
-        let hacked = hacked_proc_macro_name(&name);
-        let dispatch = dispatch_macro_name(&name);
-        let call_site = call_site_macro_name(&name);
+        let hacked = hacked_proc_macro_name(name);
+        let dispatch = dispatch_macro_name(name);
+        let call_site = call_site_macro_name(name);
 
         if !actual_names.is_empty() {
             actual_names.extend(quote!(,));
@@ -404,7 +404,7 @@ fn expand_export_nohack(export: Export) -> TokenStream {
     let mut names = TokenStream::new();
 
     for Macro { name, export_as } in &export.macros {
-        let pub_name = pub_proc_macro_name(&name);
+        let pub_name = pub_proc_macro_name(name);
         if !names.is_empty() {
             names.extend(quote!(,));
         }
