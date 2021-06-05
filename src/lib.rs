@@ -7,7 +7,7 @@
 //! This crate is allowed to contain other public things if you need, for example
 //! traits or functions or ordinary macros.
 //!
-//! https://github.com/dtolnay/proc-macro-hack/tree/master/demo-hack
+//! <https://github.com/dtolnay/proc-macro-hack/tree/master/demo-hack>
 //!
 //! ```rust
 //! #[macro_use]
@@ -38,7 +38,7 @@
 //! This crate must contain nothing but procedural macros. Private helper functions
 //! and private modules are fine but nothing can be public.
 //!
-//! https://github.com/dtolnay/proc-macro-hack/tree/master/demo-hack-impl
+//! <https://github.com/dtolnay/proc-macro-hack/tree/master/demo-hack-impl>
 //!
 //! ```rust,ignore
 //! #[macro_use]
@@ -80,7 +80,7 @@
 //! crate), then use your procedural macros as though it were magic. They even get
 //! reasonable error messages if your procedural macro panics.
 //!
-//! https://github.com/dtolnay/proc-macro-hack/tree/master/example
+//! <https://github.com/dtolnay/proc-macro-hack/tree/master/example>
 //!
 //! ```rust
 //! #[macro_use]
