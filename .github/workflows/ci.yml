@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        rust: [beta, stable, 1.45.0, 1.42.0, 1.36.0, 1.31.0]
+        rust: [beta, stable, 1.56.0, 1.31.0]
         include:
           - rust: nightly
           - rust: nightly
@@ -26,7 +26,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{matrix.rust}}
-      - if: matrix.rust == '1.31.0' || matrix.rust == '1.36.0'
+      - if: matrix.rust == '1.31.0'
         run: echo 'extern crate proc_macro;' >> demo-hack-impl/src/lib.rs
       - run: cargo run --manifest-path example/Cargo.toml
       - if: matrix.rust != '1.31.0'
