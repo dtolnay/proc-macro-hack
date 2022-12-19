@@ -3,6 +3,7 @@ name = "proc-macro-nested"
 version = "0.1.7"
 authors = ["David Tolnay <dtolnay@gmail.com>"]
 description = "Support for nested proc-macro-hack invocations"
+documentation = "https://docs.rs/proc-macro-nested"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/dtolnay/proc-macro-hack"
 
