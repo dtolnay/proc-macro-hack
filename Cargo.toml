@@ -6,7 +6,6 @@ categories = ["development-tools::procedural-macro-helpers"]
 description = "Procedural macros in expression position"
 edition = "2018"
 license = "MIT OR Apache-2.0"
-readme = "README.md"
 repository = "https://github.com/dtolnay/proc-macro-hack"
 rust-version = "1.31"
 
