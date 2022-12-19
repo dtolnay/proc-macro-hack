@@ -2,10 +2,10 @@
 name = "demo-hack"
 version = "0.0.5"
 authors = ["David Tolnay <dtolnay@gmail.com>"]
-license = "MIT OR Apache-2.0"
 description = "Demo of proc-macro-hack"
-repository = "https://github.com/dtolnay/proc-macro-hack"
 edition = "2018"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/dtolnay/proc-macro-hack"
 
 [dependencies]
 proc-macro-hack = { version = "0.5", path = ".." }
