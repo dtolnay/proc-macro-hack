@@ -1,6 +1,6 @@
 [package]
 name = "proc-macro-hack"
-version = "0.5.19"
+version = "0.5.20+deprecated"
 authors = ["David Tolnay <dtolnay@gmail.com>"]
 categories = ["development-tools::procedural-macro-helpers"]
 description = "Procedural macros in expression position"
